@@ -1,0 +1,104 @@
+---
+title: "SAGE Gait Study"
+author: '*Boadiwaa*'
+date: "Created on `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+library(knitr)
+library(tidyverse)
+library(foreign)
+library(ggpubr)
+library(gtsummary)
+library(modelsummary)
+knitr::read_chunk('edits_gait.R')
+
+```
+
+#### Overview of Demographics, Socioeconomic and Health Indices for Sub Saharan Africa (Ghana and South Africa combined)
+
+```{r, a}
+
+```
+
+
+#### Ghana Data
+```{r, b}
+
+```
+
+#### South Africa Data
+```{r c}
+
+```
+
+#### Comparison of Mean Gait Speed Across Demographic Variables
+```{r d}
+
+```
+
+
+#### Comparison of Mean Gait Speed Across Health-Related variables
+```{r, e}
+
+```
+
+
+#### Effect of WHODAS variables on gait speed
+```{r, m}
+
+```
+
+```{r, n}
+
+```
+
+
+
+#### Combined Linear Regressions Table
+```{r, f}
+
+```
+
+
+### Graphs
+
+#### Trend of Gait Speed With Age
+It can be seen clearly that with increasing age, the mean gait speed decreases:
+```{r, g}
+
+```
+
+#### Zooming In To 60+
+```{r, h}
+
+```
+
+
+#### Gender vs Normal and Rapid Gait Speed
+The results below suggest that the male gender is associated with higher gait speed:
+```{r, i}
+
+```
+
+```{r, j}
+
+```
+
+```{r, k}
+
+```
+
+```{r, l}
+
+```
+
