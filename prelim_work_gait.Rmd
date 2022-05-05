@@ -19,7 +19,7 @@ library(tidyverse)
 library(foreign)
 library(ggpubr)
 library(gtsummary)
-library(modelsummary)
+library(ggsci)
 knitr::read_chunk('edits_gait.R')
 
 ```
@@ -90,9 +90,6 @@ The results below suggest that the male gender is associated with higher gait sp
 
 ```
 
-```{r, j}
-
-```
 
 ```{r, k}
 
@@ -102,3 +99,7 @@ The results below suggest that the male gender is associated with higher gait sp
 
 ```
 
+
+```{r, o}
+
+```
