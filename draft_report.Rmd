@@ -3,13 +3,13 @@ title: "SAGE Gait Study"
 author: '*Boadiwaa*'
 date: "Created on `r format(Sys.time(), '%B %d, %Y')`"
 output:
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
   html_document:
     toc: yes
     toc_float: yes
-  pdf_document:
-    toc: yes
-  word_document:
-    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -106,11 +106,12 @@ The WHODAS variables are a series of questions that start with the following pre
 
 ### Trend of Gait Speed With Age
 It can be seen clearly in the graphs below that there is a decline in gait speed with increasing age:
-```{r, g, fig.width=20}
-
+```{r, g}
+ 
 ```
 
 ### Zooming In To 60+
+The blue line represents the linear regression model with the shaded area representing the 95% confidence interval. 
 ```{r, h}
 
 ```
