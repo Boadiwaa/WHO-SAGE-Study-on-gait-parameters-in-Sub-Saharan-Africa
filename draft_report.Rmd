@@ -1,5 +1,5 @@
 ---
-title: "SAGE Gait Study"
+title: "SAGE Gait Study - Sub-Saharan Africa"
 author: '*Boadiwaa*'
 date: "Created on `r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -25,7 +25,78 @@ knitr::read_chunk('edits_gait.R')
 
 ```
 
-### Data Analysis
+### Introduction
+The Study on global AGEing and adult health (SAGE) is part of a Longitudinal Survey Programme in the World Health Organization (WHO)’s  Multi-Country Studies unit. The main SAGE surveys compiled longitudinal information on the health and well-being of adult populations and the ageing process from nationally representative samples in six countries (China, Ghana, India, Mexico, Russian Federation and South Africa).  Wave 1 of SAGE was conducted between 2007 and 2010. This report focuses on the two countries from Sub-Saharan Africa: Ghana and South Africa. 
+
+### **Objective of report**
+
+This report aims to find associations between gait speed, and various sociodemographic, health and quality of life parameters.
+
+### **Method**
+The information in this section, with the exception of the Data Analysis subsection, is entirely derived from the SAGE WAVE 1 Ghana and SAGE WAVE 1 South Africa national reports.
+
+#### **Sample**
+
+#### Ghana
+Primary sampling units (PSUs) were selected based on proportional allocation by size and then stratified by region and location (urban/rural). Each enumeration area (EA) was selected independently
+within each stratum. 250 EAs were selected based on the availability of respondents aged 50 years and above. Within each EA, 20 households with one or more 50+ individuals and four households with members aged 18–49 years were randomly selected. Field work and data entry were undertaken between May 2007 and June 2008.
+
+#### South Africa
+A two-stage probabilistic sample design was used. The first stage of sampling was the selection of primary
+sampling units (PSUs) which is a probabilistic sample of 1000 enumeration areas (EA) drawn from the South African National Census. For the SAGE study in South Africa, a total sample of 600 EAs was drawn from the master sample and used as the PSUs. The EAs were then selected with a probability proportional to size, with the estimated number of people aged 50 years or older in each EA as a measure of size. Thus, EAs with a larger number of people aged 50 years or older had a higher chance of being selected.
+
+#### **Data Collection Protocol**
+
+#### Ghana
+Six types of questionnaires were used in the SAGE study:
+
+- a household questionnaire
+- an individual questionnaire
+- a proxy respondent questionnaire
+- a verbal autopsy questionnaire
+- a proxy validation questionnaire
+- a retest questionnaire
+
+Data collection was done manually during face-to-face interviews in respondents’ homes. A team consisted of four interviewers and one supervisor assigned to one PSU. Each interviewer was to complete interviews with two respondents per day. Completed questionnaires were organized and documented centrally before data entry. Two centres were organized in Ghana for data entry and then the final product was sent to the WHO.
+
+#### South Africa
+Four types of questionnaires were used in the SAGE study:
+
+- a household questionnaire
+- an individual questionnaire
+- a proxy respondent questionnaire
+- a verbal autopsy questionnaire
+
+Data collection was done in a CSPro software application provided by WHO, during face-to-face interviews in respondents’ homes. A team consisted of three to five interviewers and one supervisor. On average each interviewer completed two households and two individual interviews per day. The final raw data was sent to the WHO for further cleaning and weighting.
+
+#### **Survey and Data Quality**
+
+**Response rates** are a common indicator of survey quality. 
+
+For the Ghana survey:  
+
+The response rate for the individual questionnaire ranged between 92.1% for women and 97.0% for men.
+
+For the South Africa survey:  
+
+The response rate was only calculated for those aged 50 years or older and was 60%.
+
+**Age heaping** is considered to be a measure of data quality and consistency. Myers' blended index is a measure of age heaping and digit preference. If Myers’ blended index is over 60, age heaping is very severe and the data quality is poor.
+
+For the Ghana survey:  
+
+Myers’ blended index was 11.9, which indicates that a minimum of 11.9% of the population reported ages with an incorrect final digit. The index value is very low with some evidence of heaping on end digits 0 and 5.
+
+For the South Africa survey:  
+
+The Myers'blended index was 3.3, with no evidence of age heaping.
+
+From the above metrics, it can be concluded that the data to be analyzed is of good quality.
+
+
+### **Data Analysis**
+
+Only data entered from the individual questionnaires from Ghana and South Africa were analyzed for this report.
 
 #### Data Cleaning
 
@@ -81,7 +152,7 @@ The table below shows the median gait speed with the end-points of the interquar
 ```
 
 
-### Comparison of Mean Gait Speed Across Health-Related variables
+### Comparison of Median Gait Speed Across Health-Related variables
 
 Obesity,defined as a Body-Mass Index (BMI) of 30kg/m2 and above, was associated with a 0.05 decrease in mean gait speed which was considered statistically significant. Being underweight (BMI <18.5kg/m2) was associated with a reduction in mean gait speed by 0.03 (statistically insignificant).  
 
@@ -138,7 +209,8 @@ The results below suggest that the male gender is associated with slightly highe
 
 ```
 
-### Respondents'subjective assessment of pain, health and energy levels
+
+### Respondents' subjective assessment of pain, health and energy levels
 ```{r, k}
 
 ```

@@ -72,17 +72,7 @@ rm(sa_data_c)
 
 theme_gtsummary_journal(journal = "lancet")
 theme_gtsummary_compact()
-theme_customs <- theme(
-  text = element_text(family = 'firasans', size = 16),
-  plot.title.position = 'plot',
-  plot.title = element_text(
-    face = 'bold', 
-    colour = thematic::okabe_ito(8)[6],
-    margin = margin(t = 2, r = 0, b = 7, l = 0, unit = "mm")
-  ),
-)
-
-theme_set(theme_minimal() + theme_customs)
+theme_set(theme_minimal())
 
 
 cd <-gh_data %>%
@@ -209,22 +199,24 @@ cd %>% select(-rap_gs,-q1011) %>%
   tbl_uvregression(method = lm,y=norm_gs, label = ds) %>% bold_labels()
   
 ## ---- g
- gh_data %>% group_by(Age_Groups)%>% summarise(mean_gs= median(na.omit(norm_gs))) %>% 
-   ggplot(aes(x=Age_Groups,y=mean_gs))+ theme_cleveland()+
-    geom_point(size=2)+labs(title = "Ghana",y="Median Gait Speed", x="Age (in years)")
+ gh_data %>%filter(Age_Groups != "NA") %>% group_by(Age_Groups)%>% 
+   summarise(mean_gs= median(na.omit(norm_gs))) %>% 
+   ggplot(aes(x=Age_Groups,y=mean_gs))+ 
+    geom_point(size=2)+labs(title = "Ghana", y ="Median Gait Speed", x="Age (in years)")
   
-  sa_data %>% group_by(Age_Groups)%>% summarise(mean_gs= median(na.omit(norm_gs))) %>% 
-    ggplot(aes(x=Age_Groups,y=mean_gs))+ theme_cleveland()+
-    geom_point(size=2) + labs(title = "South Africa",y="Median Gait Speed", x="Age (in years)")
+  sa_data %>% filter(Age_Groups != "NA") %>% group_by(Age_Groups)%>% 
+    summarise(mean_gs= median(na.omit(norm_gs))) %>% 
+    ggplot(aes(x=Age_Groups,y=mean_gs))+ 
+    geom_point(size=2) + labs(title = "South Africa", y ="Median Gait Speed", x="Age (in years)")
   
 
   
 ## ---- h
   splus <- cd %>% filter(q1011 >= 60)
   splus%>% group_by(q1011)%>% summarise(med_gs=median(norm_gs)) %>% ggplot(aes(x=q1011,y=med_gs)) + 
-    geom_point() + 
-  geom_smooth(method = lm)+ 
-    labs(title = "Gait Speed in Age 60 and above",y="Median Gait Speed", x="Age")
+    geom_point(color = "gray40", alpha = .5) + 
+  geom_smooth(method = lm,color="black", fill= "firebrick")+ 
+    labs(title = "Gait Speed in Age 60 and above",y="Median Gait Speed", x="Age (in years)")
   
 ## ---- i
   
@@ -234,7 +226,8 @@ cd %>% select(-rap_gs,-q1011) %>%
                    position = position_dodge(width = 1),size=2)+
     geom_point(position=position_dodge(width=1),size=6)+     
     labs( title= "Normal Gait Speed", y="Median Gait Speed", x= "Country")+
-scale_colour_jama()
+scale_colour_jama()+
+   coord_flip()
  
  b<- cd %>% na.omit(ctry) %>%  group_by(ctry,Sex) %>% summarise(mean_gs= median(na.omit(rap_gs))) %>% 
    ggplot(aes(x = ctry,y=mean_gs, col = Sex)) +
@@ -242,8 +235,9 @@ scale_colour_jama()
                   position = position_dodge(width = 1),size=2)+
    geom_point(position=position_dodge(width=1),size=6)+     
    labs(title= "Rapid Gait Speed", y="Median Gait Speed", x= "Country")+
-   scale_colour_uchicago()
- ggarrange(a,b,ncol=2,nrow=1) %>% annotate_figure(top = "Gender vs Gait Speed")
+   scale_colour_uchicago()+
+   coord_flip()
+ ggarrange(a,b,ncol=1,nrow=2) %>% annotate_figure(top = "Gender vs Gait Speed")
  
     
 ## ---- k
@@ -277,12 +271,16 @@ scale_colour_jama()
                                             
 ## ---- ps  
 library(ggstatsplot)
-  cp  %>% select(q2009,ctry,norm_gs) %>% drop_na() %>%
-    ggbetweenstats(x=q2009,y=norm_gs)+ scale_color_rickandmorty()+
+  cp  %>% select(q2009,ctry,norm_gs) %>% 
+  filter(q2009 != "don't know", q2009 != "not applicable") %>% 
+    ggbetweenstats(x=q2009,y=norm_gs)+ scale_color_lancet()+ 
+    ylim(0.3,1.3)+
     labs(title = "Pain severity vs Gait Speed", y="Mean Gait Speed", x= "Pain Severity")
   
   cp %>% select(q2017,ctry,norm_gs) %>% drop_na() %>%
-    ggbetweenstats(x=q2017,y=norm_gs)+ scale_fill_jco() + scale_color_jco() +
+    filter(q2017 != "don't know") %>% 
+    ggbetweenstats(x=q2017,y=norm_gs) + scale_color_npg() +
+    ylim(0.3,1.3)+
     labs(title = "Lack of Energy vs Gait Speed", y="Mean Gait Speed", x= "Lack of Energy")
   
     
@@ -294,26 +292,32 @@ library(ggstatsplot)
   #   theme(legend.position = "none",
   #         strip.text.x = element_text(size = 8))
   cp %>% select(q2000,ctry,norm_gs) %>% 
+    filter(q2000 != "don't know") %>% 
     ggbetweenstats(x=q2000,y=norm_gs)+
-    scale_fill_jama() +
+    ylim(0.3,1.3)+ 
     scale_color_jama() +
   labs(title = "Health Rating vs Gait Speed", y="Mean Gait Speed", x= "Health Rating")
   
 ## ---- o
   cp %>% group_by(q2001) %>%
-    ggbetweenstats(x=q2001,y=norm_gs) + scale_color_uchicago() +
-    labs(title = "Difficulty with activities vs Gait Speed", y="Mean Gait Speed", x= "Difficulty level")
+    filter(q2001 != "don't know") %>% 
+    ggbetweenstats(x=q2001,y=norm_gs) + 
+    ylim(0.3,1.3)+
+    scale_color_uchicago() +
+    labs(title = "Difficulty with activities vs Gait Speed", 
+         y="Mean Gait Speed", x= "Difficulty level")
   
 ## ---- p
-  colors <- thematic::okabe_ito(8)[-6] 
+  
   
   # q2000 (health rating) vs mean gait speed vs age, especially for those with poor health ratings
   cp %>% filter(q2000 != "don't know") %>% group_by(q2000,q1011) %>% summarise(med=median(norm_gs)) %>% 
     ggplot(aes(x = q1011, y = med, col = q2000)) +
     geom_point(size = 1.5) + geom_smooth(method = "loess",se=FALSE)+
-    scale_color_manual(values = colors) +
+    scale_color_jco() +
     xlim (18, 124) + ylim(0.3,1.3) + 
-    labs(title = "Health rating vs Age vs Gait Speed", y="Median Gait Speed", x= "Age",color= "Health Rating")
+    labs(title = "Health rating vs Age vs Gait Speed", y="Median Gait Speed", x= "Age",
+         color= "Health Rating")
   
 ## ---- q
    cp %>% filter(q2001 != "don't know") %>%  group_by(q2001,q1011) %>% summarise(med=median(norm_gs)) %>% 
@@ -321,11 +325,33 @@ library(ggstatsplot)
      geom_point(size = 1.5) + geom_smooth(method = "loess",se=FALSE)+
      scale_color_jama() +
      xlim (18, 124) + ylim(0.3,1.3) + 
-     labs(title = "Difficulty with Activities vs Age vs Gait Speed", y="Median Gait Speed", x= "Age", color="Level of Difficulty")
+     labs(title = "Difficulty with Activities vs Age vs Gait Speed", 
+          y="Median Gait Speed", x= "Age (in years)", color="Level of Difficulty")
    
 ## ---- r
-
-  # start typing results for word doc
+   hpt <-gh_data %>%
+     select(norm_gs,rap_gs,avg_sbp,avg_dbp,Hypertension) %>%
+     mutate(
+       ctry = "Ghana"
+     ) %>% 
+     union_all(
+       sa_data  %>%  
+         select(norm_gs,rap_gs,avg_sbp,avg_dbp,Hypertension) %>%
+         mutate(ctry="South Africa")) %>%
+     filter(avg_sbp >130 & avg_dbp > 90) %>% 
+   
+  mutate(c_bp=paste(as.character(round(avg_sbp, digits = 1)), 
+    as.character(round(avg_dbp,digits = 1)), sep = "/")) 
+   
+ # hpt %>% filter(Hypertension !="NA") %>% 
+ #   ggplot(aes(x=avg_sbp,y=norm_gs,color=Hypertension))+
+ #   geom_point()+ ylim(0.35,2.5)+
+ #   ggplot2::scale_x_continuous(
+ #     limits = c(130, 235),
+ #     breaks = seq(from = 130, to = 235, by = 10))+
+ #   scale_color_jama()
+ #   
+  
    
    
    
