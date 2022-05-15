@@ -102,24 +102,30 @@ Only data entered from the individual questionnaires from Ghana and South Africa
 
 5573 entries were collected from Ghana and 4227 entries from South Africa. The outcomes of interest for this study were the normal and rapid gait speeds. For comparisons between independent variables, the normal gait speed was used as the dependent variable.
 
-Firstly, only entries with time above 0 seconds(s) for both normal and rapid gait were selected, reducing the number of entries to 4835 for Ghana and 3666 for South Africa. There was a huge gap between the third quartile and the maximum for both gait speeds which strongly suggested data collection errors. Upon further checks, a range of 1.0 to 12.0s was used for the normal gait speed for both Ghana and South Africa. 1.2 to 13.0s and 1.0 to 13.0s was used as the range for the rapid gait speed for Ghana and South Africa respectively and thus, leaving 136 outliers from Ghana and 119 from South Africa, and  86 outliers from Ghana and 58 outliers from South Africa for the normal and rapid gait speeds respectively. Other minor data cleaning and validation processes such as selection of relevant variables, and finding the average blood pressure and pulse reading from a set of three were carried.
+After the demographics table, only entries with time above 0 seconds(s) for both normal and rapid gait were selected, reducing the number of entries to 4835 for Ghana and 3666 for South Africa. There was a huge gap between the third quartile and the maximum for both gait speeds which strongly suggested data collection errors. Upon further checks, a range of 1.0 to 12.0s was used for the normal gait speed for both Ghana and South Africa. 1.2 to 13.0s and 1.0 to 13.0s was used as the range for the rapid gait speed for Ghana and South Africa respectively and thus, leaving 136 outliers from Ghana and 119 from South Africa, and  86 outliers from Ghana and 58 outliers from South Africa for the normal and rapid gait speeds respectively. Other minor data cleaning and validation processes such as selection of relevant variables, and finding the average blood pressure and pulse reading from a set of three were carried.
 
 The two data sets were then combined yielding a total of 8501 entries.
 
 
 ### Overview of Demographics, Socioeconomic and Health Indices for Sub Saharan Africa (Ghana and South Africa combined)
 
-As shown in the table below, the majority of respondents (~70%) were between the ages of 50 and 80.Median age was 60 for Ghana and 59 for South Africa. The lowest count for the age groupings was for 80 years and above. The majority of respondents from Ghana were male, and from South Africa: female. The majority of respondents did not provide an answer when asked the number of years of (formal) education they had received. For those who did, most had completed between 9 and 12 years of education.
+As shown in the table below, the majority of respondents (~84%) were aged 50 years and above, and 51% were at least 60 years old..Median age was 60 for both Ghana and South Africa. The lowest count for the age groupings was for 80 years and above. The majority of respondents from Ghana were male, and from South Africa: female. The majority of respondents did not provide an answer when asked the number of years of (formal) education they had received. For those who did, majority of those from Ghana had completed a minimum of 10 and a maximum of 12 years of education and the majority for South Africa had a minimum of 7 and a maximum of 9 years.
 
-The majority of respondents in Ghana resided in rural areas whereas for South Africa, the opposite was noted. The majority of respondents were "currently married" in both countries, with the next highest proportion widowed. About twice the proportion of respondents who were separated/divorced in South Africa were separated/divorced in Ghana, and almost thrice the proportion of respondents who had never married in Ghana had never married in South Africa. The majority of respondents had low income satisfaction.
+The majority of respondents in Ghana resided in rural areas whereas for South Africa, the opposite was noted. The majority of respondents were "currently married" in both countries, with the next highest proportion widowed. About twice the proportion of respondents who were separated/divorced in South Africa were separated/divorced in Ghana, and about thrice the proportion of respondents who had never married in Ghana had never married in South Africa. The majority of respondents had low income satisfaction.
 
 The majority of respondents in Ghana were of normal weight whereas the majority from South Africa were obese.The majority of respondents had no history of chronic disease or alcohol use. For tobacco use however, the majority from Ghana had a positive history whereas the majority from South Africa had a negative history.
 
-Preliminary analysis of the gait speeds showed that the data distribution is skewed to the right, and thus the median was used as the measure of central tendency. The normal gait speed was the same in both countries, and South Africa had a slightly higher rapid gait speed.
+
 
 
 
 ```{r, a}
+
+```
+
+Preliminary analysis of the gait speeds showed that the data distribution is skewed to the right, and thus the median was used as the measure of central tendency. The normal gait speed was the same in both countries, and South Africa had a slightly higher rapid gait speed. the table below shows the median gait speed for both countries and the graph shows the distribution.
+
+```{r, gs}
 
 ```
 
@@ -197,7 +203,7 @@ It can be seen clearly in the graphs below that there is a decline in gait speed
 ```
 
 ### Zooming In To 60+
-The blue line represents the linear regression model with the shaded area representing the 95% confidence interval. 
+The black line represents the linear regression model with the shaded area representing the 95% confidence interval. 
 ```{r, h}
 
 ```

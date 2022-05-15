@@ -9,28 +9,39 @@ library(ggsci)
 
 
 ## ---- a
+theme_gtsummary_journal(journal = "lancet")
+theme_gtsummary_compact()
+theme_set(theme_minimal())
+
 gh_data <- read.dta("ghana.dta",convert.factors = T) %>% as_tibble()
 gh_data$q2507[gh_data$q2507 >990] <- 0
 gh_data$q2507[gh_data$q2508 >990] <- 0
 
 #Selection of relevant columns and finding averages of systolic and diastolic BP, pulse, from the 3 readings
-gh_data <- select(gh_data, c(q0104,q1009,q1011,q1012,q1016,q1017,q1018,q1019,q1023,q2000:q2003,q2009,q2025,q2028,q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,q2047,q2501_s:q2513, q4001,q4010,q4014,q4022,q4025,q4033,q4040,q4060,q4062,q4069,q3001,q3007,q7002))%>%
+gh_data <- select(gh_data, c(q0104,q1009,q1011,q1012,q1016,q1017,q1018,q1019,q1023,q2000:q2003,q2009,q2025,q2028,
+                             q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,q2047,q2501_s:q2513, q4001,q4010,
+                             q4014,q4022,q4025,q4033,q4040,q4060,q4062,q4069,q3001,q3007,q7002))%>%
   rowwise()%>%
   mutate(avg_sbp = mean(c(q2501_s, q2502_s, q2503_s),na.rm = TRUE),
          avg_dbp = mean(c(q2501_d, q2502_d, q2503_d),na.rm = TRUE),
          avg_p=mean(c(q2501a_p, q2502a_p, q2503a_p),na.rm = TRUE), 
          BMI=round(q2507/((q2506/100)^2),digits = 1),.keep = "unused")
 
-gh_data <- gh_data %>% mutate(Edu_yrs = cut(q1017,c(0,6,9,12,15,20,30 ),include.lowest=TRUE),Age_Groups = cut(q1011,c(18,49,59,69,79,122),include.lowest=TRUE))
+gh_data <- gh_data %>% mutate(Edu_yrs = cut(q1017,c(0,6,9,12,15,20,30 ),include.lowest=TRUE),
+                              Age_Groups = cut(q1011,c(18,49,59,69,79,122),include.lowest=TRUE))
 
 gh_data$BMI[gh_data$BMI< 18.5] <- "Underweight"
 gh_data$BMI[gh_data$BMI %in% seq(30,122,0.1)] <- "Obese"
 gh_data$BMI[gh_data$BMI %in%  seq(18.5,24.9,0.1)] <- "Normal Weight"
 gh_data$BMI[gh_data$BMI %in%  seq(25.0,29.9,0.1)] <- "Overweight"
 levels(gh_data$Age_Groups) <- c("18 to 49", "50 to 59", "60 to 69", "70 to 79", "80 and above")
-levels(gh_data$Edu_yrs) <- c("0 to 6", "6 to 9", "9 to 12", "12 to 15", "15 to 20", "20 to 30")
+levels(gh_data$Edu_yrs) <- c("0 to 6", "7 to 9", "10 to 12", "13 to 15", "16 to 20", "22 to 30")
 
-colnames(gh_data)[colnames(gh_data) %in% c("q0104","q1009","q1012","q7002","q4001","q4010","q4014", "q4022","q4025", "q4033","q4040", "q4060", "q4062", "q4069","q3001","q3007")] <- c("Residence", "Sex", "Marital_Status","Alcohol_use","Arthritis","Stroke","Angina","Diabetes_Mellitus","Chronic_Lung_Disease","Asthma", "Depression", "Hypertension", "Cataracts","Injuries_RTA" ,"Tobacco_use", "Income")
+colnames(gh_data)[colnames(gh_data) %in% c("q0104","q1009","q1012","q7002","q4001","q4010","q4014", 
+                                           "q4022","q4025", "q4033","q4040", "q4060", "q4062", "q4069","q3001","q3007")] <- c(
+                                             "Residence", "Sex", "Marital_Status","Alcohol_use","Arthritis","Stroke",
+                                             "Angina","Diabetes_Mellitus","Chronic_Lung_Disease","Asthma", "Depression", 
+                                             "Hypertension", "Cataracts","Injuries_RTA" ,"Tobacco_use", "Income")
 
 
 #SA Data
@@ -39,50 +50,48 @@ sa_data$q2507[sa_data$q2507 >990] <- 0
 sa_data$q2507[sa_data$q2508 >990] <- 0
 
 #Selection of relevant columns and finding averages of systolic and diastolic BP, pulse, from the 3 readings
-sa_data <- select(sa_data, c(q0104,q0105a,q0409,q1009,q1011,q1012,q1016,q1017,q1018,q1019,q1023,q2000:q2003,q2009,q2025,q2028,q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,q2047,q2501_s:q2513, q4001,q4010,q4014,q4022,q4025,q4033,q4040,q4060,q4062,q4066,q4069,q3001,q3002,q3007,q3010,q7002))%>%
+sa_data <- select(sa_data, c(q0104,q0105a,q0409,q1009,q1011,q1012,q1016,q1017,
+                             q1018,q1019,q1023,q2000:q2003,q2009,q2025,q2028,q2032,q2011,q2014,
+                             q2015,q2017,q2033,q2035:q2039,q2047,q2501_s:q2513, q4001,q4010,q4014,
+                             q4022,q4025,q4033,q4040,q4060,q4062,q4066,q4069,q3001,q3002,q3007,q3010,q7002))%>%
   rowwise()%>%
-  mutate(avg_sbp = mean(c(q2501_s, q2502_s, q2503_s),na.rm = TRUE), avg_dbp = mean(c(q2501_d, q2502_d, q2503_d),na.rm = TRUE), avg_p=mean(c(q2501a_p, q2502a_p, q2503a_p),na.rm = TRUE),BMI=round(q2507/((q2506/100)^2),digits = 1),.keep = "unused")
-sa_data <- sa_data %>% mutate(Edu_yrs = cut(q1017,c(0,6,9,12,15,20,30 ),include.lowest=TRUE),Age_Groups = cut(q1011,c(18,49,59,69,79,122),include.lowest=TRUE))
+  mutate(avg_sbp = mean(c(q2501_s, q2502_s, q2503_s),na.rm = TRUE),
+         avg_dbp = mean(c(q2501_d, q2502_d, q2503_d),na.rm = TRUE), avg_p=mean(c(q2501a_p, q2502a_p, q2503a_p),na.rm = TRUE),
+         BMI=round(q2507/((q2506/100)^2),digits = 1),.keep = "unused")
+sa_data <- sa_data %>% mutate(Edu_yrs = cut(q1017,c(0,6,9,12,15,20,30 ),include.lowest=TRUE),
+                              Age_Groups = cut(q1011,c(18,49,59,69,79,122),include.lowest=TRUE))
 
 sa_data$BMI[sa_data$BMI< 18.5] <- "Underweight"
 sa_data$BMI[sa_data$BMI %in% seq(30,225,0.1)] <- "Obese"
 sa_data$BMI[sa_data$BMI %in%  seq(18.5,24.9,0.1)] <- "Normal Weight"
 sa_data$BMI[sa_data$BMI %in%  seq(25.0,29.9,0.1)] <- "Overweight"
 levels(sa_data$Age_Groups) <- c("18 to 49", "50 to 59", "60 to 69", "70 to 79", "80 and above")
-levels(sa_data$Edu_yrs) <- c("0 to 6", "6 to 9", "9 to 12", "12 to 15", "15 to 20", "20 to 30")
+levels(sa_data$Edu_yrs) <- c("0 to 6", "7 to 9", "10 to 12", "13 to 15", "16 to 20", "22 to 30")
 
 
-colnames(sa_data)[colnames(sa_data) %in% c("q0104","q1009","q1012","q7002","q4001","q4010","q4014", "q4022","q4025", "q4033","q4040", "q4060", "q4062", "q4069","q3001","q3007")] <- c("Residence", "Sex", "Marital_Status","Alcohol_use","Arthritis","Stroke","Angina","Diabetes_Mellitus","Chronic_Lung_Disease","Asthma", "Depression", "Hypertension", "Cataracts","Injuries_RTA" ,"Tobacco_use", "Income")
+colnames(sa_data)[colnames(sa_data) %in% 
+                    c("q0104","q1009","q1012","q7002","q4001","q4010",
+                                           "q4014", "q4022","q4025", "q4033","q4040", "q4060", "q4062", 
+                                           "q4069","q3001","q3007")] <- c("Residence", "Sex", "Marital_Status",
+                                                                          "Alcohol_use","Arthritis","Stroke","Angina",
+                                                                          "Diabetes_Mellitus","Chronic_Lung_Disease","Asthma",
+                                                                          "Depression", "Hypertension", "Cataracts",
+                                                                          "Injuries_RTA" ,"Tobacco_use", "Income")
 
+# Combined demographics
 
-sa_data <-sa_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
-gh_data <-gh_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
-gh_data_c <-gh_data%>% filter(q2511 < 12.1, q2513 >1.1, q2513 <13.1)%>%rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
-gh_data$norm_gs[gh_data$q2511 >12.0] <- 0.7861
-gh_data$rap_gs[gh_data$q2513 >13.0] <- 1.1840
-gh_data$rap_gs[gh_data$q2513 < 1.2] <- 1.1840
-
-gh_data <- select(gh_data, -q2511, -q2513)
-rm(gh_data_c)
-sa_data_c <-sa_data%>% filter(q2511 < 12.1, q2513 <13.1)%>%rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
-sa_data$norm_gs[sa_data$q2511 >12.0] <- 0.8486
-gh_data$rap_gs[gh_data$q2513 >13.0] <- 1.3180
-sa_data <- select(sa_data, -q2511, -q2513)
-rm(sa_data_c)
-
-theme_gtsummary_journal(journal = "lancet")
-theme_gtsummary_compact()
-theme_set(theme_minimal())
-
-
-cd <-gh_data %>%
-  select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs, BMI,Angina,Chronic_Lung_Disease,Asthma,Arthritis,Stroke,Diabetes_Mellitus,Injuries_RTA,Depression,Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
+dem <-gh_data %>%
+  select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,#norm_gs,rap_gs, 
+         BMI,Angina,Chronic_Lung_Disease,Asthma,Arthritis,Stroke,Diabetes_Mellitus,Injuries_RTA,Depression,
+         Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
   mutate(
     ctry = "Ghana"
   ) %>% 
   union_all(
     sa_data  %>%  
-      select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs, BMI,Angina,Arthritis,Stroke,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Injuries_RTA,Depression,Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
+      select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,#norm_gs,rap_gs,
+             BMI,Angina,Arthritis,Stroke,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Injuries_RTA,Depression,
+             Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
       mutate(ctry="South Africa")
   ) 
 n <- list(Age_Groups ~"Age (in years)",
@@ -90,8 +99,8 @@ n <- list(Age_Groups ~"Age (in years)",
           Edu_yrs ~"Years of Education",
           Income ~"Income Satisfaction",
           Marital_Status ~"Marital Status",
-          norm_gs ~" Normal Gait Speed",
-          rap_gs ~ "Rapid Gait Speed",
+          #norm_gs ~" Normal Gait Speed",
+          #rap_gs ~ "Rapid Gait Speed",
           Angina ~"History of Angina",
           Chronic_Lung_Disease ~"History of CLD*",
           Asthma ~"History of Asthma",
@@ -105,29 +114,113 @@ n <- list(Age_Groups ~"Age (in years)",
           Tobacco_use ~"History of Tobacco use",
           Alcohol_use ~ "History of Alcohol use")
 
-cd %>% tbl_summary(by=ctry, label=n) %>% bold_labels() 
+dem %>% tbl_summary(by=ctry, label=n) %>% 
+  bold_labels() %>% 
+  modify_caption("**Table 1. Overview of Socio-Demographic and Health Characteristics**")
+
+
+
+# Dealing with gait speed outliers
+
+sa_data <-sa_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+gh_data <-gh_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+gh_data_c <-gh_data%>% filter(q2511 < 12.1, q2513 >1.1, q2513 <13.1)%>%
+  rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+gh_data$norm_gs[gh_data$q2511 >12.0] <- 0.7861
+gh_data$rap_gs[gh_data$q2513 >13.0] <- 1.1840
+gh_data$rap_gs[gh_data$q2513 < 1.2] <- 1.1840
+gh_data <- select(gh_data, -q2511, -q2513)
+rm(gh_data_c)
+
+sa_data_c <-sa_data%>% filter(q2511 < 12.1, q2513 <13.1)%>%rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+sa_data$norm_gs[sa_data$q2511 >12.0] <- 0.8486
+gh_data$rap_gs[gh_data$q2513 >13.0] <- 1.3180
+sa_data <- select(sa_data, -q2511, -q2513)
+rm(sa_data_c)
+
+cd <-gh_data %>%
+  select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs, 
+         BMI,Angina,Chronic_Lung_Disease,Asthma,Arthritis,Stroke,Diabetes_Mellitus,Injuries_RTA,Depression,
+         Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
+  mutate(
+    ctry = "Ghana"
+  ) %>% 
+  union_all(
+    sa_data  %>%  
+      select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs,
+             BMI,Angina,Arthritis,Stroke,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Injuries_RTA,Depression,
+             Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
+      mutate(ctry="South Africa")
+  ) 
+
+n <- list(Age_Groups ~"Age (in years)",
+          q1011 ~"Age",
+          Edu_yrs ~"Years of Education",
+          Income ~"Income Satisfaction",
+          Marital_Status ~"Marital Status",
+          #norm_gs ~" Normal Gait Speed",
+          #rap_gs ~ "Rapid Gait Speed",
+          Angina ~"History of Angina",
+          Chronic_Lung_Disease ~"History of CLD*",
+          Asthma ~"History of Asthma",
+          Arthritis ~ "History of Arthritis",
+          Stroke ~"History of Stroke",
+          Diabetes_Mellitus ~"History of DM*",
+          Injuries_RTA ~"History of RTA*",
+          Depression ~"History of Depression",
+          Hypertension ~"History of HPT*",
+          Cataracts ~ "History of Cataracts",
+          Tobacco_use ~"History of Tobacco use",
+          Alcohol_use ~ "History of Alcohol use")
+
 
 ## ---- b
-gh_data%>% select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Depression,Hypertension,Cataracts,Tobacco_use,Alcohol_use)%>% 
+
+gh_data%>% select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,
+                  rap_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Depression,
+                  Hypertension,Cataracts,Tobacco_use,Alcohol_use)%>% 
    gtsummary::tbl_summary(by=Sex,
                                   label = n) %>% add_p() %>% bold_labels() 
 
 ## ---- c
-sa_data%>% select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Depression,Hypertension,Cataracts,Tobacco_use,Alcohol_use)%>% 
+
+sa_data%>% select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,
+                  rap_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Depression,
+                  Hypertension,Cataracts,Tobacco_use,Alcohol_use)%>% 
   as_factor() %>% gtsummary::tbl_summary(by=Sex,
-                                                
-                                         label = n) %>% add_p() %>% bold_labels() 
+              label = n) %>%
+  add_p() %>% bold_labels() 
+
+## ---- gs
+cd %>% select(ctry,norm_gs,rap_gs) %>% 
+  tbl_summary(by=ctry,
+              label=list(norm_gs ~"Normal Gait Speed",
+                         rap_gs ~"Rapid Gait Speed")) %>% 
+  bold_labels()  %>%
+  modify_caption("**Table 2. Country-wise Comparison of Gait Speed**")
+
+
+cd %>% select(ctry,norm_gs) %>% ggplot(aes(x = norm_gs, 
+                                           fill = ctry)) +
+  xlim(0,1.75)+
+  geom_density(alpha = 0.75)+
+  scale_fill_lancet()+ labs(fill="Country",
+                            title= "Distribution of the Normal Gait Speed in Ghana and South Africa",
+                            x="Normal Gait Speed")
 
 ## ---- d
+
  cd %>% 
-   select(ctry,Age_Groups,norm_gs,Edu_yrs,Residence,Sex,Income,Marital_Status) %>% tbl_strata(strata=ctry, .tbl_fun = ~.x %>% tbl_continuous(variable = norm_gs,
-                                                                                                                                             label = list(Age_Groups ~"Age (in years)",
-                                                                                                                                                          Edu_yrs ~"Years of Education",
-                                                                                                                                                          Marital_Status ~"Marital Status",
-                                                                                                                                                          Income ~"Income Satisfaction",
-                                                                                                                                                          norm_gs ~" Normal Gait Speed")) %>% 
-                                                                                                modify_spanning_header(all_stat_cols() ~ "**Mean Gait Speed per Demographics **")) %>% bold_labels()
-                                                                                                 
+   select(ctry,Age_Groups,norm_gs,Edu_yrs,Residence,Sex,Income,Marital_Status) %>% 
+   tbl_strata(strata=ctry, .tbl_fun = ~.x %>% tbl_continuous(variable = norm_gs,
+                                                            label = list(Age_Groups ~"Age (in years)",
+                                                            Edu_yrs ~"Years of Education",
+                                                            Marital_Status ~"Marital Status",
+                                                            Income ~"Income Satisfaction",
+                                                            norm_gs ~" Normal Gait Speed")) %>% 
+                                                          modify_spanning_header(all_stat_cols() ~ "**Mean Gait Speed per Demographics **")) %>% 
+                                                   bold_labels()
+
 
 
   #datasummary( Age_Groups+Edu_yrs+Residence+Marital_Status+Sex+Income ~ ctry * `norm_gs` * (Mean + SD), data=t)
@@ -150,7 +243,8 @@ sa_data%>% select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,n
    Alcohol_use ~ "History of Alcohol use")
   
  cd %>% 
-    select(ctry,norm_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Depression,Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
+    select(ctry,norm_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,
+           Depression,Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
     tbl_strata(strata=ctry, .tbl_fun = ~.x %>% tbl_continuous(variable = norm_gs, 
                                                               label = ds)) %>% bold_labels()
   
@@ -244,13 +338,13 @@ scale_colour_jama()+
   #Difficulty in daily life due to pain and Problems due to not feeling refreshed during the day (from lack of energy)
 
    cp <-gh_data %>%
-    select(q2000,q2009,norm_gs,rap_gs,q2017,q1011, q2001) %>%
+    select(q2000,q2009,Sex,norm_gs,rap_gs,q2017,q1011, q2001) %>%
     mutate(
       ctry = "Ghana"
     ) %>% 
     union_all(
       sa_data  %>%  
-        select(q2000,q2009,norm_gs,rap_gs,q2017,q1011,q2001) %>%
+        select(q2000,q2009,Sex,norm_gs,rap_gs,q2017,q1011,q2001) %>%
         mutate(ctry="South Africa"))
    
    pv <-list(q2009 ~"Difficulty due to pain",
@@ -271,38 +365,75 @@ scale_colour_jama()+
                                             
 ## ---- ps  
 library(ggstatsplot)
-  cp  %>% select(q2009,ctry,norm_gs) %>% 
-  filter(q2009 != "don't know", q2009 != "not applicable") %>% 
-    ggbetweenstats(x=q2009,y=norm_gs)+ scale_color_lancet()+ 
-    ylim(0.3,1.3)+
-    labs(title = "Pain severity vs Gait Speed", y="Mean Gait Speed", x= "Pain Severity")
+library(ggbeeswarm)
+library(ggthemes)
+   
+   cp %>% select(q2000,ctry,norm_gs) %>% 
+     filter(q2000 != "don't know") %>% 
+     ggplot(aes(x=q2000,y=norm_gs,color=q2000))+ 
+     stat_compare_means(label.x = 0.75,
+                        label.y=0.15)+
+     geom_quasirandom(alpha = 0.7,
+                      size = 1.5) + ylim(0,2.5)+
+     theme_economist()+ 
+     geom_boxplot()+
+     theme(legend.position = "none")+
+     scale_color_economist(name=NULL)+
+     labs(title = "Health Rating vs Gait Speed", y="Normal Gait Speed",
+          x= "Health Rating")
+   
   
+
   cp %>% select(q2017,ctry,norm_gs) %>% drop_na() %>%
-    filter(q2017 != "don't know") %>% 
-    ggbetweenstats(x=q2017,y=norm_gs) + scale_color_npg() +
-    ylim(0.3,1.3)+
-    labs(title = "Lack of Energy vs Gait Speed", y="Mean Gait Speed", x= "Lack of Energy")
-  
+    filter(q2017 != "don't know") %>%
+    ggplot(aes(x=q2017,y=norm_gs,color=q2017))+
+    stat_compare_means(label.x = 0.75,
+                       label.y=0.15)+
+    geom_quasirandom(alpha = 0.7,
+                     size = 1.5) +
+    geom_boxplot()+
+    scale_color_uchicago() +
+    ylim(0,2.5)+ theme(legend.position = "none")+
+    labs(title = "Lack of Energy vs Gait Speed", y="Normal Gait Speed",
+         x= "Lack of Energy")
+
+
     
 ## ---- l
-  #Health Rating, and Difficulty with household activities
-  # library(ggridges)
-  # ggplot(aes(x=norm_gs,y=q2000,fill=q2000)) +
-  #   geom_density_ridges(alpha=0.6, bandwidth=4) + xlim(-5,5) +
-  #   theme(legend.position = "none",
-  #         strip.text.x = element_text(size = 8))
-  cp %>% select(q2000,ctry,norm_gs) %>% 
-    filter(q2000 != "don't know") %>% 
-    ggbetweenstats(x=q2000,y=norm_gs)+
-    ylim(0.3,1.3)+ 
+  
+cp  %>% select(q2009,ctry,norm_gs) %>% 
+    filter(q2009 != "don't know", q2009 != "not applicable") %>% 
+    ggplot(aes(x=q2009,y=norm_gs,color=q2009))+ 
+    stat_compare_means(label.x = 0.75,
+                       label.y=0.15)+
+    geom_quasirandom(alpha = 0.7,
+                     size = 1.5) + 
+    geom_boxplot() +
     scale_color_jama() +
-  labs(title = "Health Rating vs Gait Speed", y="Mean Gait Speed", x= "Health Rating")
+    ylim(0,2.5)+ theme(legend.position = "none")+
+    labs(title = "Pain severity vs Gait Speed", y="Normal Gait Speed", 
+         x= "Pain Severity")
+  #Health Rating, and Difficulty with household activities
+#    library(ggridges)
+# cp %>% filter(Sex!="Unknown") %>% 
+#   ggplot(aes(x=norm_gs,y=q2000,fill=Sex)) +
+#     geom_density_ridges(alpha=0.6, bandwidth=4) + xlim(-10,20) +
+#   scale_fill_cyclical(
+#                       # labels = c(`1997 Summer` = "Summer",
+#                       #            `1997 Winter` = "Winter"),
+#                       values = c("tomato", "dodgerblue"),
+#                       name = "Sex:", guide = "legend") +
+#     theme_ridges(grid = FALSE) +
+#   theme(legend.position = "none",
+#           strip.text.x = element_text(size = 8))
+
+ 
   
 ## ---- o
   cp %>% group_by(q2001) %>%
     filter(q2001 != "don't know") %>% 
     ggbetweenstats(x=q2001,y=norm_gs) + 
-    ylim(0.3,1.3)+
+    ylim(0,1.75)+
     scale_color_uchicago() +
     labs(title = "Difficulty with activities vs Gait Speed", 
          y="Mean Gait Speed", x= "Difficulty level")
