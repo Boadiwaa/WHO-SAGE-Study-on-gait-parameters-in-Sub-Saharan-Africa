@@ -21,6 +21,7 @@ library(ggpubr)
 library(gtsummary)
 library(ggsci)
 library(flextable)
+library(grafify)
 knitr::read_chunk('edits_gait.R')
 
 ```
@@ -181,7 +182,7 @@ Using the 12-item World Health Organization's Disability Assessment Schedule, ve
 The WHODAS-related variables are a series of questions that start with the following preamble:
 "Overall in the last 30 days, how much difficulty…", followed by various parameters/tasks.
 
-As expected, generally, there is a statistically significant decrease in gait speed, as the respondents' level of difficulty in accomplishing the task increases. The tables below gives a breakdown of the variables:
+The table below gives an overview of the WHODAS questions and answers.
 
 ##### **"Overall in the last 30 days, how much difficulty: "**
 ```{r, m}
@@ -189,12 +190,19 @@ As expected, generally, there is a statistically significant decrease in gait sp
 ```
 
 
-##### **"Overall in the last 30 days, how much difficulty: "**
+#### Association of WHODAS score with gait speed
+
+The respondents' answers were re-coded with **0 equivalent to "none", 1 equivalent to "mild", 2 to "moderate", 3 to "severe" and 4 to "extreme".** Across the 12 variables, a respondent could score a **minimum of 0 and a maximum of 48.** As shown in the table below, the highest score was 10 and there is no apparent effect of the score on the gait speed.
+
 ```{r, n}
 
 ```
 
+Here is a visualization of the WHODAS score in relation to gait speed in those aged 50 years and above:
 
+```{r, wg}
+ 
+```
 
 ### Trend of Gait Speed With Age
 It can be seen clearly in the graphs below that there is a decline in gait speed with increasing age:

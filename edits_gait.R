@@ -6,6 +6,7 @@ library(ggpubr)
 library(gtsummary)
 library(foreign)
 library(ggsci)
+library(grafify)
 
 
 ## ---- a
@@ -37,10 +38,10 @@ gh_data$BMI[gh_data$BMI %in%  seq(25.0,29.9,0.1)] <- "Overweight"
 levels(gh_data$Age_Groups) <- c("18 to 49", "50 to 59", "60 to 69", "70 to 79", "80 and above")
 levels(gh_data$Edu_yrs) <- c("0 to 6", "7 to 9", "10 to 12", "13 to 15", "16 to 20", "22 to 30")
 
-colnames(gh_data)[colnames(gh_data) %in% c("q0104","q1009","q1012","q7002","q4001","q4010","q4014", 
+colnames(gh_data)[colnames(gh_data) %in% c("q0104","q1009","q1011","q1012","q7002","q4001","q4010","q4014",
                                            "q4022","q4025", "q4033","q4040", "q4060", "q4062", "q4069","q3001","q3007")] <- c(
-                                             "Residence", "Sex", "Marital_Status","Alcohol_use","Arthritis","Stroke",
-                                             "Angina","Diabetes_Mellitus","Chronic_Lung_Disease","Asthma", "Depression", 
+                                             "Residence","Sex","Age", "Marital_Status","Alcohol_use","Arthritis","Stroke",
+                                             "Angina","Diabetes_Mellitus","Chronic_Lung_Disease","Asthma", "Depression",
                                              "Hypertension", "Cataracts","Injuries_RTA" ,"Tobacco_use", "Income")
 
 
@@ -70,18 +71,17 @@ levels(sa_data$Edu_yrs) <- c("0 to 6", "7 to 9", "10 to 12", "13 to 15", "16 to 
 
 
 colnames(sa_data)[colnames(sa_data) %in% 
-                    c("q0104","q1009","q1012","q7002","q4001","q4010",
-                                           "q4014", "q4022","q4025", "q4033","q4040", "q4060", "q4062", 
-                                           "q4069","q3001","q3007")] <- c("Residence", "Sex", "Marital_Status",
-                                                                          "Alcohol_use","Arthritis","Stroke","Angina",
-                                                                          "Diabetes_Mellitus","Chronic_Lung_Disease","Asthma",
-                                                                          "Depression", "Hypertension", "Cataracts",
-                                                                          "Injuries_RTA" ,"Tobacco_use", "Income")
+                    c("q0104","q1009","q1011","q1012","q7002","q4001","q4010","q4014",
+                      "q4022","q4025", "q4033","q4040", "q4060", "q4062", "q4069","q3001","q3007")] <- c(
+                        "Residence","Sex","Age", "Marital_Status","Alcohol_use","Arthritis","Stroke",
+                        "Angina","Diabetes_Mellitus","Chronic_Lung_Disease","Asthma", "Depression",
+                        "Hypertension", "Cataracts","Injuries_RTA" ,"Tobacco_use", "Income")
 
+                   
 # Combined demographics
 
 dem <-gh_data %>%
-  select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,#norm_gs,rap_gs, 
+  select(Age_Groups,Age,Sex,Edu_yrs,Residence,Marital_Status,Income,#norm_gs,rap_gs, 
          BMI,Angina,Chronic_Lung_Disease,Asthma,Arthritis,Stroke,Diabetes_Mellitus,Injuries_RTA,Depression,
          Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
   mutate(
@@ -89,13 +89,14 @@ dem <-gh_data %>%
   ) %>% 
   union_all(
     sa_data  %>%  
-      select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,#norm_gs,rap_gs,
+      select(Age_Groups,Age,Sex,Edu_yrs,Residence,Marital_Status,Income,#norm_gs,rap_gs,
              BMI,Angina,Arthritis,Stroke,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Injuries_RTA,Depression,
              Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
       mutate(ctry="South Africa")
   ) 
-n <- list(Age_Groups ~"Age (in years)",
-          q1011 ~"Age",
+
+n <- list(Age_Groups ~"Age Groups (in years)",
+          Age ~"Age (in years)",
           Edu_yrs ~"Years of Education",
           Income ~"Income Satisfaction",
           Marital_Status ~"Marital Status",
@@ -118,12 +119,13 @@ dem %>% tbl_summary(by=ctry, label=n) %>%
   bold_labels() %>% 
   modify_caption("**Table 1. Overview of Socio-Demographic and Health Characteristics**")
 
-
-
 # Dealing with gait speed outliers
 
-sa_data <-sa_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
-gh_data <-gh_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+sa_data <-sa_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>%
+  mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+gh_data <-gh_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>%
+  mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+
 gh_data_c <-gh_data%>% filter(q2511 < 12.1, q2513 >1.1, q2513 <13.1)%>%
   rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
 gh_data$norm_gs[gh_data$q2511 >12.0] <- 0.7861
@@ -132,14 +134,15 @@ gh_data$rap_gs[gh_data$q2513 < 1.2] <- 1.1840
 gh_data <- select(gh_data, -q2511, -q2513)
 rm(gh_data_c)
 
-sa_data_c <-sa_data%>% filter(q2511 < 12.1, q2513 <13.1)%>%rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+sa_data_c <-sa_data%>% filter(q2511 < 12.1, q2513 <13.1)%>%rowwise()%>% 
+  mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
 sa_data$norm_gs[sa_data$q2511 >12.0] <- 0.8486
-gh_data$rap_gs[gh_data$q2513 >13.0] <- 1.3180
+sa_data$rap_gs[sa_data$q2513 >13.0] <- 1.3180
 sa_data <- select(sa_data, -q2511, -q2513)
 rm(sa_data_c)
 
 cd <-gh_data %>%
-  select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs, 
+  select(Age_Groups,Age,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs, 
          BMI,Angina,Chronic_Lung_Disease,Asthma,Arthritis,Stroke,Diabetes_Mellitus,Injuries_RTA,Depression,
          Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
   mutate(
@@ -147,19 +150,19 @@ cd <-gh_data %>%
   ) %>% 
   union_all(
     sa_data  %>%  
-      select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs,
+      select(Age_Groups,Age,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,rap_gs,
              BMI,Angina,Arthritis,Stroke,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Injuries_RTA,Depression,
              Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
       mutate(ctry="South Africa")
   ) 
 
-n <- list(Age_Groups ~"Age (in years)",
-          q1011 ~"Age",
+n <- list(Age_Groups ~"Age Groups (in years)",
+          Age ~"Age (in years)",
           Edu_yrs ~"Years of Education",
           Income ~"Income Satisfaction",
           Marital_Status ~"Marital Status",
-          #norm_gs ~" Normal Gait Speed",
-          #rap_gs ~ "Rapid Gait Speed",
+          norm_gs ~" Normal Gait Speed",
+          rap_gs ~ "Rapid Gait Speed",
           Angina ~"History of Angina",
           Chronic_Lung_Disease ~"History of CLD*",
           Asthma ~"History of Asthma",
@@ -176,16 +179,18 @@ n <- list(Age_Groups ~"Age (in years)",
 
 ## ---- b
 
-gh_data%>% select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,
-                  rap_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Depression,
+gh_data%>% select(Age_Groups,Age,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,
+                  rap_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,
+                  Chronic_Lung_Disease,Asthma,Depression,
                   Hypertension,Cataracts,Tobacco_use,Alcohol_use)%>% 
    gtsummary::tbl_summary(by=Sex,
                                   label = n) %>% add_p() %>% bold_labels() 
 
 ## ---- c
 
-sa_data%>% select(Age_Groups,q1011,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,
-                  rap_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,Depression,
+sa_data%>% select(Age_Groups,Age,Sex,Edu_yrs,Residence,Marital_Status,Income,norm_gs,
+                  rap_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,
+                  Chronic_Lung_Disease,Asthma,Depression,
                   Hypertension,Cataracts,Tobacco_use,Alcohol_use)%>% 
   as_factor() %>% gtsummary::tbl_summary(by=Sex,
               label = n) %>%
@@ -250,45 +255,73 @@ cd %>% select(ctry,norm_gs) %>% ggplot(aes(x = norm_gs,
   
 ## ---- m
      whodas <-gh_data %>%
-     select(q2011,q2014,q2015,q2028,norm_gs,q2032,q2033, q2035,q2036, q2037, q2038,q2039,q2047) %>%
+     select(Age,q2011,q2014,q2015,q2028,q2032,q2033, q2035,q2036, q2037, q2038,q2039,q2047,norm_gs) %>%
      mutate(
        ctry = "Ghana"
      ) %>% 
      union_all(
        sa_data  %>%  
-         select(q2011,q2014,q2015,q2028,norm_gs,q2032,q2033, q2035,q2036, q2037, q2038,q2039,q2047) %>%
+         select(Age,q2011,q2014,q2015,q2028,q2032,q2033, q2035,q2036, q2037, q2038,q2039,q2047,norm_gs) %>%
          mutate(ctry="South Africa"))
      
      who<- list( q2039~ "in your day to day work?",
                  q2014 ~ "with making new friendships or
-                                                               maintaining current friendships?",
+                      maintaining current friendships?",
                  q2015~"with dealing with strangers?",
                  q2011 ~"did you have in learning a new task?",
                  q2032 ~"in taking care of your household
-                                                               responsibilities?",
+                        responsibilities?",
                  q2033 ~"in joining in community activities? ",
                  q2035 ~"concentrating on doing something for
-                                                             10 minutes?",
+                        10 minutes?",
                  q2036 ~"in walking a long distance such as a
-                                                             kilometer?",
+                        kilometer?",
                  q2028 ~ "in standing for long periods (such as 30 minutes)?",
                  q2037~"in bathing/washing your whole body?",
                  q2038~"in getting dressed?",
                  q2047 ~"In the last 30 days, how much have you been emotionally
-                                                             affected by your health condition(s)?")
+                        affected by your health condition(s)?")
    
-   whodas %>% select(-norm_gs) %>% tbl_summary(by=ctry, 
+     wd<- whodas %>% filter_at(vars(contains("q")), all_vars(. != "don't know")) %>% 
+       filter_at(vars(contains("q")),
+                 all_vars(. != "not applicable")) %>% 
+       mutate_at(vars(contains("q")), as.character)  
+     
+     wd%>%select(-norm_gs,-Age)%>%tbl_summary(by=ctry, 
                                                label = who) %>% bold_labels()
    
 ## ---- n
-   whodas %>% select(-ctry) %>% 
-     tbl_uvregression(method = lm,y=norm_gs, 
-                                 label = who)%>% bold_labels()
-                                                                             
-   
-   
+wd[wd=="none"] <- as.character(0)
+wd[wd=="mild"] <- as.character(1)
+wd[wd=="moderate"] <- as.character(2)
+wd[wd=="severe"] <- as.character(3)
+wd[wd=="extreme"] <- as.character(4)
+
+wd <- wd %>% mutate_at(vars(contains("q")), as.numeric) %>% rowwise()%>%
+  mutate(Score = sum(q2011:q2047,na.rm = TRUE)) 
+
+wd%>% select(Score,ctry) %>% tbl_summary(by=ctry,type = list(Score ~ "categorical")) %>% 
+  bold_labels()
+
+wd %>% select(norm_gs,Score,ctry) %>%tbl_strata(strata=ctry, .tbl_fun = ~.x %>% 
+                                                  tbl_continuous(variable = norm_gs)) %>% 
+  bold_labels()
+
+wd<- wd %>% mutate(Score= factor(Score, 
+                                    levels=c("0","1","2","3","4","5", "6", "7", "9", "10"),
+                                    ordered=TRUE))
+
+## ----wg  
+wd %>% group_by(Age,Score) %>% summarise(med=median(norm_gs)) %>% 
+  ggplot(aes(x = Age, y = med, col = Score)) +
+  geom_point(size = 1.5) + geom_smooth(method = "lm",se=FALSE)+
+  scale_color_grafify(palette="muted") +
+  xlim (50, 124) + ylim(0.3,1.3) +
+  labs(title = "WHODAS Score vs Age vs Gait Speed",
+       y="Median Gait Speed", x= "Age (in years)", color="WHODAS Score")
+
 ## ---- f
-cd %>% select(-rap_gs,-q1011) %>% 
+cd %>% select(-rap_gs,-Age) %>% 
    
   tbl_uvregression(method = lm,y=norm_gs, label = ds) %>% bold_labels()
   
@@ -306,8 +339,8 @@ cd %>% select(-rap_gs,-q1011) %>%
 
   
 ## ---- h
-  splus <- cd %>% filter(q1011 >= 60)
-  splus%>% group_by(q1011)%>% summarise(med_gs=median(norm_gs)) %>% ggplot(aes(x=q1011,y=med_gs)) + 
+  splus <- cd %>% filter(Age >= 60)
+  splus%>% group_by(Age)%>% summarise(med_gs=median(norm_gs)) %>% ggplot(aes(x=Age,y=med_gs)) + 
     geom_point(color = "gray40", alpha = .5) + 
   geom_smooth(method = lm,color="black", fill= "firebrick")+ 
     labs(title = "Gait Speed in Age 60 and above",y="Median Gait Speed", x="Age (in years)")
@@ -338,13 +371,13 @@ scale_colour_jama()+
   #Difficulty in daily life due to pain and Problems due to not feeling refreshed during the day (from lack of energy)
 
    cp <-gh_data %>%
-    select(q2000,q2009,Sex,norm_gs,rap_gs,q2017,q1011, q2001) %>%
+    select(q2000,q2009,Sex,norm_gs,rap_gs,q2017,Age, q2001) %>%
     mutate(
       ctry = "Ghana"
     ) %>% 
     union_all(
       sa_data  %>%  
-        select(q2000,q2009,Sex,norm_gs,rap_gs,q2017,q1011,q2001) %>%
+        select(q2000,q2009,Sex,norm_gs,rap_gs,q2017,Age,q2001) %>%
         mutate(ctry="South Africa"))
    
    pv <-list(q2009 ~"Difficulty due to pain",
@@ -359,7 +392,7 @@ scale_colour_jama()+
   tbl_summary(by=ctry, label = pv ) %>% bold_labels()
 ## ---- km
                                             
-   cp %>% select(-rap_gs,-q1011,-ctry) %>% tbl_uvregression(method = lm,y=norm_gs, label = pv) %>% bold_labels()
+   cp %>% select(-rap_gs,Age,-ctry) %>% tbl_uvregression(method = lm,y=norm_gs, label = pv) %>% bold_labels()
      
                                          
                                             
@@ -442,8 +475,8 @@ cp  %>% select(q2009,ctry,norm_gs) %>%
   
   
   # q2000 (health rating) vs mean gait speed vs age, especially for those with poor health ratings
-  cp %>% filter(q2000 != "don't know") %>% group_by(q2000,q1011) %>% summarise(med=median(norm_gs)) %>% 
-    ggplot(aes(x = q1011, y = med, col = q2000)) +
+  cp %>% filter(q2000 != "don't know") %>% group_by(q2000,Age) %>% summarise(med=median(norm_gs)) %>% 
+    ggplot(aes(x = Age, y = med, col = q2000)) +
     geom_point(size = 1.5) + geom_smooth(method = "loess",se=FALSE)+
     scale_color_jco() +
     xlim (18, 124) + ylim(0.3,1.3) + 
@@ -451,8 +484,8 @@ cp  %>% select(q2009,ctry,norm_gs) %>%
          color= "Health Rating")
   
 ## ---- q
-   cp %>% filter(q2001 != "don't know") %>%  group_by(q2001,q1011) %>% summarise(med=median(norm_gs)) %>% 
-     ggplot(aes(x = q1011, y = med, col = q2001)) +
+   cp %>% filter(q2001 != "don't know") %>%  group_by(q2001,Age) %>% summarise(med=median(norm_gs)) %>% 
+     ggplot(aes(x = Age, y = med, col = q2001)) +
      geom_point(size = 1.5) + geom_smooth(method = "loess",se=FALSE)+
      scale_color_jama() +
      xlim (18, 124) + ylim(0.3,1.3) + 
