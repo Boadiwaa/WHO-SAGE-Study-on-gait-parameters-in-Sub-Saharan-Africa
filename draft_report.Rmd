@@ -231,7 +231,7 @@ The results below suggest that the male gender is associated with slightly highe
 
 ### Association of Pain, Health Rating and Energy Levels with gait speed
 
-There is a statistically significant decrease in gait speed with a poor ranking of respondents'pain levels, health rating and energy levels.
+There is a statistically significant decrease in gait speed with a poor ranking of respondents' pain levels, health rating and energy levels.
 
 ```{r, km}
 

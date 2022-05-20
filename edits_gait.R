@@ -217,14 +217,19 @@ cd %>% select(ctry,norm_gs) %>% ggplot(aes(x = norm_gs,
 
  cd %>% 
    select(ctry,Age_Groups,norm_gs,Edu_yrs,Residence,Sex,Income,Marital_Status) %>% 
-   tbl_strata(strata=ctry, .tbl_fun = ~.x %>% tbl_continuous(variable = norm_gs,
-                                                            label = list(Age_Groups ~"Age (in years)",
-                                                            Edu_yrs ~"Years of Education",
-                                                            Marital_Status ~"Marital Status",
-                                                            Income ~"Income Satisfaction",
-                                                            norm_gs ~" Normal Gait Speed")) %>% 
-                                                          modify_spanning_header(all_stat_cols() ~ "**Mean Gait Speed per Demographics **")) %>% 
-                                                   bold_labels()
+   filter_all(all_vars(. != "Unknown")) %>% 
+   filter_all(all_vars(. != "don't know")) %>% 
+   filter_all(all_vars(. != "not applicable")) %>% 
+   mutate_at(vars(!contains("norm_gs")), as.character) %>% 
+   tbl_strata(strata=ctry, .tbl_fun = ~.x %>% 
+               tbl_continuous(variable = norm_gs,
+                    label = list(Age_Groups ~"Age (in years)",
+                  Edu_yrs ~"Years of Education",
+                          Marital_Status ~"Marital Status",
+        Income ~"Income Satisfaction",
+            norm_gs ~" Normal Gait Speed")) %>% 
+            modify_spanning_header(all_stat_cols() ~ "**Mean Gait Speed per Demographics **")) %>% 
+          bold_labels()
 
 
 
@@ -247,11 +252,15 @@ cd %>% select(ctry,norm_gs) %>% ggplot(aes(x = norm_gs,
    Tobacco_use ~"History of Tobacco use",
    Alcohol_use ~ "History of Alcohol use")
   
- cd %>% 
+cd %>% 
     select(ctry,norm_gs,BMI,Injuries_RTA,Arthritis,Stroke,Angina,Diabetes_Mellitus,Chronic_Lung_Disease,Asthma,
-           Depression,Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>%
-    tbl_strata(strata=ctry, .tbl_fun = ~.x %>% tbl_continuous(variable = norm_gs, 
-                                                              label = ds)) %>% bold_labels()
+           Depression,Hypertension,Cataracts,Tobacco_use,Alcohol_use) %>% 
+   filter_all(all_vars(. != "Unknown")) %>% 
+   filter_all(all_vars(. != "don't know")) %>% 
+   mutate_at(vars(!contains("norm_gs")), as.character) %>% 
+tbl_strata(strata=ctry, .tbl_fun = ~.x %>% 
+                 tbl_continuous(variable = norm_gs, 
+                label = ds)) %>% bold_labels()
   
 ## ---- m
      whodas <-gh_data %>%
@@ -284,13 +293,14 @@ cd %>% select(ctry,norm_gs) %>% ggplot(aes(x = norm_gs,
    
      wd<- whodas %>% filter_at(vars(contains("q")), all_vars(. != "don't know")) %>% 
        filter_at(vars(contains("q")),
-                 all_vars(. != "not applicable")) %>% 
-       mutate_at(vars(contains("q")), as.character)  
+                 all_vars(. != "not applicable"))
+       
      
      wd%>%select(-norm_gs,-Age)%>%tbl_summary(by=ctry, 
                                                label = who) %>% bold_labels()
    
 ## ---- n
+wd <- wd %>% mutate_at(vars(contains("q")), as.character)  
 wd[wd=="none"] <- as.character(0)
 wd[wd=="mild"] <- as.character(1)
 wd[wd=="moderate"] <- as.character(2)
@@ -321,10 +331,34 @@ wd %>% group_by(Age,Score) %>% summarise(med=median(norm_gs)) %>%
        y="Median Gait Speed", x= "Age (in years)", color="WHODAS Score")
 
 ## ---- f
-cd %>% select(-rap_gs,-Age) %>% 
-   
-  tbl_uvregression(method = lm,y=norm_gs, label = ds) %>% bold_labels()
-  
+rn <- list(Age_Groups ~"Age Groups (in years)",
+           # Age ~"Age (in years)",
+           # Edu_yrs ~"Years of Education",
+           Income ~"Income Satisfaction",
+           Marital_Status ~"Marital Status",
+           norm_gs ~" Normal Gait Speed",
+           #rap_gs ~ "Rapid Gait Speed",
+           Angina ~"History of Angina",
+           Chronic_Lung_Disease ~"History of CLD*",
+           Asthma ~"History of Asthma",
+           Arthritis ~ "History of Arthritis",
+           Stroke ~"History of Stroke",
+           Diabetes_Mellitus ~"History of DM*",
+           Injuries_RTA ~"History of RTA*",
+           Depression ~"History of Depression",
+           Hypertension ~"History of HPT*",
+           Cataracts ~ "History of Cataracts",
+           Tobacco_use ~"History of Tobacco use",
+           Alcohol_use ~ "History of Alcohol use")
+
+cd %>% select(-rap_gs,-Age,-ctry, -Edu_yrs) %>%
+filter_all(all_vars(. != "Unknown")) %>% 
+filter_all(all_vars(. != "don't know")) %>% 
+filter_all(all_vars(. != "not applicable")) %>% 
+mutate_at(vars(!contains("norm_gs")),as.character)%>% 
+tbl_uvregression(method = lm,y=norm_gs, label = rn) %>% 
+bold_labels()
+
 ## ---- g
  gh_data %>%filter(Age_Groups != "NA") %>% group_by(Age_Groups)%>% 
    summarise(mean_gs= median(na.omit(norm_gs))) %>% 
@@ -387,12 +421,19 @@ scale_colour_jama()+
              q2000 ~"Health Rating",
              q2001 ~"Difficulty with activities")
    
-   cp %>%select(q2000,q2001,q2009,q2017,ctry) %>%  
-   
-  tbl_summary(by=ctry, label = pv ) %>% bold_labels()
+   cp %>%select(q2000,q2001,q2009,q2017,ctry) %>% 
+     filter_all(all_vars(. != "don't know")) %>% 
+     # filter_all(all_vars(. != "not applicable")) %>% 
+     # mutate_at(vars(!contains("norm_gs")), as.character) %>% 
+   tbl_summary(by=ctry, label = pv ) %>% bold_labels()
+
 ## ---- km
                                             
-   cp %>% select(-rap_gs,Age,-ctry) %>% tbl_uvregression(method = lm,y=norm_gs, label = pv) %>% bold_labels()
+   cp %>% select(-rap_gs,-Age,-Sex,-ctry) %>% 
+     filter_all(all_vars(. != "don't know")) %>% 
+     filter_all(all_vars(. != "not applicable")) %>% 
+     # mutate_at(vars(!contains("norm_gs")), as.character) %>% 
+     tbl_uvregression(method = lm,y=norm_gs, label = pv) %>% bold_labels()
      
                                          
                                             
