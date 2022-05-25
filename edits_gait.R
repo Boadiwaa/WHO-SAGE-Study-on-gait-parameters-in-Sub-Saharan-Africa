@@ -533,7 +533,7 @@ cp  %>% select(q2009,ctry,norm_gs) %>%
      labs(title = "Difficulty with Activities vs Age vs Gait Speed", 
           y="Median Gait Speed", x= "Age (in years)", color="Level of Difficulty")
    
-## ---- r
+## ---- hr
    hpt <-gh_data %>%
      select(norm_gs,rap_gs,avg_sbp,avg_dbp,Hypertension) %>%
      mutate(
@@ -548,15 +548,19 @@ cp  %>% select(q2009,ctry,norm_gs) %>%
   mutate(c_bp=paste(as.character(round(avg_sbp, digits = 1)), 
     as.character(round(avg_dbp,digits = 1)), sep = "/")) 
    
- # hpt %>% filter(Hypertension !="NA") %>% 
- #   ggplot(aes(x=avg_sbp,y=norm_gs,color=Hypertension))+
- #   geom_point()+ ylim(0.35,2.5)+
- #   ggplot2::scale_x_continuous(
- #     limits = c(130, 235),
- #     breaks = seq(from = 130, to = 235, by = 10))+
- #   scale_color_jama()
- #   
-  
-   
+ hpt %>% filter(Hypertension !="NA", Hypertension != "don't know" ) %>%
+   ggplot(aes(x=avg_sbp,y=norm_gs,color=Hypertension))+
+   geom_smooth(method="lm")+ ylim(0.35,2.5)+
+   ggplot2::scale_x_continuous(
+     limits = c(130, 235),
+     breaks = seq(from = 130, to = 235, by = 10))+
+   scale_color_jama() + 
+   labs(x="Average systolic BP",
+      y="Normal gait speed",
+      title = "History of Hypertension vs Gait Speed"  )
+                          
+
+
+
    
    

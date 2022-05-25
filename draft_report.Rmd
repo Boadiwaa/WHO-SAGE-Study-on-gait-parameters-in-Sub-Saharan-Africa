@@ -259,4 +259,9 @@ The figures below are graphical representations of the above parameters.
 
 ```{r, q}
 
+``` 
+
+
+```{r, hr}
+
 ```
