@@ -22,78 +22,17 @@ library(gtsummary)
 library(ggsci)
 library(flextable)
 library(grafify)
+library(qpcR)
+library(ggstatsplot)
+library(ggbeeswarm)
+library(ggthemes)
+library(ggrepel)
+
 knitr::read_chunk('edits_gait.R')
 
 ```
 
-### Introduction
-The Study on global AGEing and adult health (SAGE) is part of a Longitudinal Survey Programme in the World Health Organization (WHO)’s  Multi-Country Studies unit. The main SAGE surveys compiled longitudinal information on the health and well-being of adult populations and the ageing process from nationally representative samples in six countries (China, Ghana, India, Mexico, Russian Federation and South Africa).  Wave 1 of SAGE was conducted between 2007 and 2010. This report focuses on the two countries from Sub-Saharan Africa: Ghana and South Africa. 
-
-### **Objective of report**
-
-This report aims to find associations between gait speed, and various sociodemographic, health and quality of life parameters.
-
-### **Method**
-The information in this section, with the exception of the Data Analysis subsection, is entirely derived from the SAGE WAVE 1 Ghana and SAGE WAVE 1 South Africa national reports.
-
-#### **Sample**
-
-#### Ghana
-Primary sampling units (PSUs) were selected based on proportional allocation by size and then stratified by region and location (urban/rural). Each enumeration area (EA) was selected independently
-within each stratum. 250 EAs were selected based on the availability of respondents aged 50 years and above. Within each EA, 20 households with one or more 50+ individuals and four households with members aged 18–49 years were randomly selected. Field work and data entry were undertaken between May 2007 and June 2008.
-
-#### South Africa
-A two-stage probabilistic sample design was used. The first stage of sampling was the selection of primary
-sampling units (PSUs) which is a probabilistic sample of 1000 enumeration areas (EA) drawn from the South African National Census. For the SAGE study in South Africa, a total sample of 600 EAs was drawn from the master sample and used as the PSUs. The EAs were then selected with a probability proportional to size, with the estimated number of people aged 50 years or older in each EA as a measure of size. Thus, EAs with a larger number of people aged 50 years or older had a higher chance of being selected.
-
-#### **Data Collection Protocol**
-
-#### Ghana
-Six types of questionnaires were used in the SAGE study:
-
-- a household questionnaire
-- an individual questionnaire
-- a proxy respondent questionnaire
-- a verbal autopsy questionnaire
-- a proxy validation questionnaire
-- a retest questionnaire
-
-Data collection was done manually during face-to-face interviews in respondents’ homes. A team consisted of four interviewers and one supervisor assigned to one PSU. Each interviewer was to complete interviews with two respondents per day. Completed questionnaires were organized and documented centrally before data entry. Two centres were organized in Ghana for data entry and then the final product was sent to the WHO.
-
-#### South Africa
-Four types of questionnaires were used in the SAGE study:
-
-- a household questionnaire
-- an individual questionnaire
-- a proxy respondent questionnaire
-- a verbal autopsy questionnaire
-
-Data collection was done in a CSPro software application provided by WHO, during face-to-face interviews in respondents’ homes. A team consisted of three to five interviewers and one supervisor. On average each interviewer completed two households and two individual interviews per day. The final raw data was sent to the WHO for further cleaning and weighting.
-
-#### **Survey and Data Quality**
-
-**Response rates** are a common indicator of survey quality. 
-
-For the Ghana survey:  
-
-The response rate for the individual questionnaire ranged between 92.1% for women and 97.0% for men.
-
-For the South Africa survey:  
-
-The response rate was only calculated for those aged 50 years or older and was 60%.
-
-**Age heaping** is considered to be a measure of data quality and consistency. Myers' blended index is a measure of age heaping and digit preference. If Myers’ blended index is over 60, age heaping is very severe and the data quality is poor.
-
-For the Ghana survey:  
-
-Myers’ blended index was 11.9, which indicates that a minimum of 11.9% of the population reported ages with an incorrect final digit. The index value is very low with some evidence of heaping on end digits 0 and 5.
-
-For the South Africa survey:  
-
-The Myers'blended index was 3.3, with no evidence of age heaping.
-
-From the above metrics, it can be concluded that the data to be analyzed is of good quality.
-
+### **RESULTS**
 
 ### **Data Analysis**
 
@@ -108,25 +47,26 @@ After the demographics table, only entries with time above 0 seconds(s) for both
 The two data sets were then combined yielding a total of 8501 entries.
 
 
-### Overview of Demographics, Socioeconomic and Health Indices for Sub Saharan Africa (Ghana and South Africa combined)
+### Overview of Demographics and Socioeconomic Indices for Sub Saharan Africa (Ghana and South Africa combined)
 
-As shown in the table below, the majority of respondents (~84%) were aged 50 years and above, and 51% were at least 60 years old..Median age was 60 for both Ghana and South Africa. The lowest count for the age groupings was for 80 years and above. The majority of respondents from Ghana were male, and from South Africa: female. The majority of respondents did not provide an answer when asked the number of years of (formal) education they had received. For those who did, majority of those from Ghana had completed a minimum of 10 and a maximum of 12 years of education and the majority for South Africa had a minimum of 7 and a maximum of 9 years.
+The majority of respondents (~84% representing 8564 respondents) were aged 50 years and above, and 1224 were from the control group (ages 18 to 49).  This represents ~ 1:7 ratio of control group to study group.
 
-The majority of respondents in Ghana resided in rural areas whereas for South Africa, the opposite was noted. The majority of respondents were "currently married" in both countries, with the next highest proportion widowed. About twice the proportion of respondents who were separated/divorced in South Africa were separated/divorced in Ghana, and about thrice the proportion of respondents who had never married in Ghana had never married in South Africa. The majority of respondents had low income satisfaction.
+The findings below are for the study group only.
 
-The majority of respondents in Ghana were of normal weight whereas the majority from South Africa were obese.The majority of respondents had no history of chronic disease or alcohol use. For tobacco use however, the majority from Ghana had a positive history whereas the majority from South Africa had a negative history.
-
-
-
+Median age was 62 for both Ghana and 61 for South Africa. The lowest count for the age groupings was for 80 years and above. The majority of respondents were female. 
+The majority of respondents in Ghana resided in rural areas whereas for South Africa, the opposite was noted. The majority of respondents were either cohabiting or "currently married" in both countries, with the next highest proportion widowed. About twice the proportion of respondents who were separated/divorced in South Africa were separated/divorced in Ghana, and about nine times the proportion of respondents who had never married in Ghana had never married in South Africa. Income was almost equally distributed across the 5 quintiles.
 
 
 ```{r, a}
 
 ```
 
-Preliminary analysis of the gait speeds showed that the data distribution is skewed to the right, and thus the median was used as the measure of central tendency. The normal gait speed was the same in both countries, and South Africa had a slightly higher rapid gait speed. the table below shows the median gait speed for both countries and the graph shows the distribution.
 
-```{r, gs}
+### Overview of Health-related Indices for Sub Saharan Africa (Ghana and South Africa combined)  
+
+<!-- The majority of respondents in Ghana were of normal weight whereas the majority from South Africa were obese.The majority of respondents had no history of chronic disease or alcohol use. For tobacco use however, the majority from Ghana had a positive history whereas the majority from South Africa had a negative history. -->
+
+```{r, com}
 
 ```
 
@@ -134,46 +74,41 @@ Preliminary analysis of the gait speeds showed that the data distribution is ske
 
 #### Ghana Data
 
-Focusing on Ghana, the median age was 60 for females and 58 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females (0.09 difference). With rapid gait speed, the gender difference increased to 0.2. The majority of males had a history of tobacco use whereas majority of females had no history.
+Focusing on Ghana, the median age was 64 for females and 61 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased to 0.2. The majority of males had a history of tobacco use whereas majority of females had no history.
 
+#### South Africa Data
+
+Focusing on South Africa, the median age was 60 for females and 59 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased slightly further.
 
 ```{r, b}
 
 ```
 
-#### South Africa Data
-
-Focusing on South Africa, the median age was 60 for females and 59 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females (0.10 difference). With rapid gait speed, the gender difference increased to 0.18.
 
 ```{r c}
 
 ```
 
-### Comparison of Median Gait Speed Across Demographic Variables
+### Comparison of Gait Speed Across Demographic Variables
 
-The table below shows the median gait speed with the end-points of the interquartile range in brackets. there is a statistically significant decrease in normal gait speed with increasing age, with a 0.21 decrease in ages 80 and above compared to ages 49 and below. There is no apparent association between years of education and gait speed. Respondents in rural areas had a slightly higher gait speed than those in urban areas (0.02) difference, which was not statistically significant. Having a partner ("currently married"or "cohabiting") was associated with a slightly higher gait speed though this association was not statistically significant. Having low income satisfaction was associated with lower gait speed though this association was not statistically significant.  
-
+The table below shows the multiple regression results with the gait speed as the outcome variable and the various demographics variables as the independent variables.
 
 ```{r d}
 
 ```
 
 
-### Comparison of Median Gait Speed Across Health-Related variables
+### Comparison of Gait Speed Across Health-Related variables
 
-Obesity,defined as a Body-Mass Index (BMI) of 30kg/m2 and above, was associated with a 0.05 decrease in mean gait speed which was considered statistically significant. Being underweight (BMI <18.5kg/m2) was associated with a reduction in mean gait speed by 0.03 (statistically insignificant).  
+<!-- Obesity,defined as a Body-Mass Index (BMI) of 30kg/m2 and above, decrease in mean gait speed which was considered statistically significant. Being underweight (BMI <18.5kg/m2) was associated with a reduction in mean gait speed by 0.03 (statistically insignificant).   -->
 
-Generally, having no history of chronic disease was associated with higher gait speed, with the exception of Diabetes Mellitus, Injury from Road Traffic Accidents and Cataracts. A history of alcohol use was associated with a statistically significant lower gait speed. On the other hand, a history of tobacco use was associated with an insignificant increase in gait speed.
+<!-- Generally, having no history of chronic disease was associated with higher gait speed, with the exception of Diabetes Mellitus, Injury from Road Traffic Accidents and Cataracts. A history of alcohol use was associated with a statistically significant lower gait speed. On the other hand, a history of tobacco use was associated with an insignificant increase in gait speed. -->
 
 
 ```{r, e}
 
 ```
 
-#### Combined Linear Regressions Table
-```{r, f}
-
-```
 
 ### Association of WHODAS variables and gait speed 
 
@@ -198,7 +133,7 @@ The respondents' answers were re-coded with **0 equivalent to "none", 1 equivale
 
 ```
 
-Here is a visualization of the WHODAS score in relation to gait speed in those aged 50 years and above:
+
 
 ```{r, wg}
  
@@ -210,7 +145,7 @@ It can be seen clearly in the graphs below that there is a decline in gait speed
  
 ```
 
-### Zooming In To 60+
+### Zooming In To 75+
 The black line represents the linear regression model with the shaded area representing the 95% confidence interval. 
 ```{r, h}
 
@@ -218,50 +153,21 @@ The black line represents the linear regression model with the shaded area repre
 
 
 ### Gender vs Normal and Rapid Gait Speed
-The results below suggest that the male gender is associated with slightly higher gait speed:
+The results below suggest that the male gender is associated with slightly higher mean gait speed:
 ```{r, i}
 
 ```
 
 
 ### Respondents' subjective assessment of pain, health and energy levels
-```{r, k}
 
-```
+### Association of Health Rating with gait speed
 
-### Association of Pain, Health Rating and Energy Levels with gait speed
+The graph below shows respondents' subjective assessment of health level and it's association with gait speed. The line in the box represent the median, and the entire box represents the interquartile range. The density of the surrounding dotted area represents the number of respondents' who chose that answer as their health rating.
 
-There is a statistically significant decrease in gait speed with a poor ranking of respondents' pain levels, health rating and energy levels.
 
-```{r, km}
-
-```
-
-#### Related Graphs
-The figures below are graphical representations of the above parameters.
 ```{r, ps}
 
 ```
 
-```{r, l}
-
-```
-
-
-```{r, o}
-
-```
-
-
-```{r, p}
-
-```
-
-```{r, q}
-
-``` 
-
-
-```{r, hr}
-
-```
+ 
