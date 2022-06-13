@@ -56,11 +56,9 @@ The findings below are for the study group only.
 Median age was 62 for both Ghana and 61 for South Africa. The lowest count for the age groupings was for 80 years and above. The majority of respondents were female. 
 The majority of respondents in Ghana resided in rural areas whereas for South Africa, the opposite was noted. The majority of respondents were either cohabiting or "currently married" in both countries, with the next highest proportion widowed. About twice the proportion of respondents who were separated/divorced in South Africa were separated/divorced in Ghana, and about nine times the proportion of respondents who had never married in Ghana had never married in South Africa. Income was almost equally distributed across the 5 quintiles.
 
-
 ```{r, a}
 
 ```
-
 
 ### Overview of Health-related Indices for Sub Saharan Africa (Ghana and South Africa combined)  
 
@@ -109,33 +107,14 @@ The table below shows the multiple regression results with the gait speed as the
 
 ```
 
+#### Association of health indices with gait speed  
 
-### Association of WHODAS variables and gait speed 
+Using the 12-item World Health Organization’s Disability Assessment Schedule, version 2 (WHODAS-II), respondent’s functional ability was measured. The 12-item questionnaire measured the activities of daily living(ADLs) and instrumental activities of daily living (IADLs).
 
-Using the 12-item World Health Organization's Disability Assessment Schedule, version 2 (WHODAS-II), respondent’s functional ability was measured. The 12-item questionnaire measured the activities of daily living (ADLs) and instrumental activities of daily living (IADLs). 
-
-The WHODAS-related variables are a series of questions that start with the following preamble:
-"Overall in the last 30 days, how much difficulty…", followed by various parameters/tasks.
-
-The table below gives an overview of the WHODAS questions and answers.
-
-##### **"Overall in the last 30 days, how much difficulty: "**
-```{r, m}
-
-```
-
-
-#### Association of WHODAS score with gait speed
-
-The respondents' answers were re-coded with **0 equivalent to "none", 1 equivalent to "mild", 2 to "moderate", 3 to "severe" and 4 to "extreme".** Across the 12 variables, a respondent could score a **minimum of 0 and a maximum of 48.** As shown in the table below, the highest score was 10 and there is no apparent effect of the score on the gait speed.
+The WHODAS-related variables are a series of questions that start with the following preamble: “Overall in the last 30 days, how much difficulty…”, followed by various parameters/tasks.
+The respondents' answers were re-coded with **0 equivalent to "none", 1 equivalent to "mild", 2 to "moderate", 3 to "severe" and 4 to "extreme".** Across the 12 variables, a respondent could score a **minimum of 0 and a maximum of 48.** The table below compares the 12-item WHODAS variables in general, and specifically the three questions which deal with the ADLs, as well as height, and BMI and gait speed.
 
 ```{r, n}
-
-```
-
-
-
-```{r, wg}
  
 ```
 
@@ -165,9 +144,10 @@ The results below suggest that the male gender is associated with slightly highe
 
 The graph below shows respondents' subjective assessment of health level and it's association with gait speed. The line in the box represent the median, and the entire box represents the interquartile range. The density of the surrounding dotted area represents the number of respondents' who chose that answer as their health rating.
 
-
 ```{r, ps}
 
 ```
 
- 
+```{r, pe}
+
+``` 

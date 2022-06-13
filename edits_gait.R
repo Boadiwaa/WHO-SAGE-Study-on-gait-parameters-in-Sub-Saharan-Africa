@@ -25,7 +25,8 @@ gh_data$q1017[is.na(gh_data$q1017)] = 0
 
 gh_data<- gh_data %>%  dplyr::select(q0104,q1009,q1011,q1012,q1016,q1017,q1018,q1019,q1023,
                                      q2000:q2003,q2009,q2025,q2028,
-                                     q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,q2047,
+                                     q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,
+                                     q2042,q2044,q2047,
                                      q2501_s:q2513,q4001,q4003,q4004,
                                      q4008,q4010,q4012,q4014:q4017,q4022,q4025,q4033,q4040,
                                      q4060:q4065,q3001,q3002,q3009a:q3009g, quintile_c) %>% 
@@ -87,24 +88,19 @@ gh_data<-qpcR:::cbind.na(gh_data,t5) %>% mutate(alcohol=factor(alcohol))
 #q3001 being maintained for hx of tbc as no one selected no for 3002, even for those who selected 
 #  no for 3001.
 
-
 colnames(gh_data)[colnames(gh_data) %in% c("q0104","q1009","q1011","q1012", "quintile_c")] <- c(
                                           "Residence","Sex","Age", "Marital_Status","Income")
-
-
 #SA Data
 sa_data <- read.dta("sa.dta", convert.factors=T) %>% as_tibble()
 sa_data$q2507[sa_data$q2507 >990] <- 0
 sa_data$q2507[sa_data$q2508 >990] <- 0
 sa_data$q1017[is.na(sa_data$q1017)] <- 0
 
-
 #Selection of relevant columns and finding averages of systolic and diastolic BP, pulse, from the 3 readings
-
-
 sa_data <- sa_data %>% dplyr::select(q0104,q1009,q1011,q1012,q1016,q1017,q1018,q1019,q1023,
                                     q2000:q2003,q2009,q2025,q2028,
-                                    q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,q2047,
+                                    q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,
+                                    q2042,q2044,q2047,
                                     q2501_s:q2513,q4001,q4003,q4004,
                                     q4008,q4010,q4012,q4014:q4017,q4022,q4025,q4033,q4040,
                                     q4060:q4065,q3001,q3002,q3009a:q3009g, quintile_c)%>%
@@ -204,7 +200,6 @@ com <- gh_data %>% filter(Age>49) %>%
       mutate(ctry="South Africa")
   ) 
 
-
 ## ---- com
 com<-com %>%mutate_at(vars(starts_with("q")),all_vars(as.character(.)))
 com$q4022[com$q4022 == "don't know"] <- NA
@@ -247,7 +242,6 @@ sa_data$norm_gs[sa_data$q2511 >12.0] <- 0.8486
 sa_data$rap_gs[sa_data$q2513 >13.0] <- 1.3180
 sa_data <- dplyr::select(sa_data, -q2511, -q2513)
 rm(sa_data_c)
-
 
 ## ---- b
 gh_data<-gh_data %>% mutate(mst = as.character(Marital_Status))
@@ -296,7 +290,6 @@ fcd %>% dplyr::select(-rap_gs) %>%
       bold_labels() %>% add_p()
   )
 
-
 ## ---- c
 com %>% dplyr::select(-Age) %>%  filter_all(all_vars(!is.na(.))) %>% 
   tbl_strata(
@@ -321,7 +314,6 @@ com %>% dplyr::select(-Age) %>%  filter_all(all_vars(!is.na(.))) %>%
   )
 
 ## ---- d
-
  cd %>% 
    dplyr::select(ctry,Age_Groups,norm_gs,Edu_yrs,mst,Residence,Sex,Income) %>% 
    filter_all(all_vars(. != "Unknown")) %>% 
@@ -340,7 +332,6 @@ com %>% dplyr::select(-Age) %>%  filter_all(all_vars(!is.na(.))) %>%
       bold_labels())
 
   #datasummary( Age_Groups+Edu_yrs+Residence+Marital_Status+Sex+Income ~ ctry * `norm_gs` * (Mean + SD), data=t)
- 
  
 ## ---- e
 cr <- gh_data %>% 
@@ -374,76 +365,109 @@ cr %>% dplyr::select(-hp) %>%
 modify_caption("**Table 6. Multiple Regression: Gait Speed vs Health-Related Variables**")%>%
   bold_labels())
  
-# ## ---- m
-#      whodas <-gh_data %>%
-#      select(Age,q2011,q2014,q2015,q2028,q2032,q2033, q2035,q2036, q2037, q2038,q2039,q2047,norm_gs) %>%
-#      mutate(
-#        ctry = "Ghana"
-#      ) %>% 
-#      union_all(
-#        sa_data  %>%  
-#          select(Age,q2011,q2014,q2015,q2028,q2032,q2033, q2035,q2036, q2037, q2038,q2039,q2047,norm_gs) %>%
-#          mutate(ctry="South Africa"))
-#      
-#      who<- list( q2039~ "in your day to day work?",
-#                  q2014 ~ "with making new friendships or
-#                       maintaining current friendships?",
-#                  q2015~"with dealing with strangers?",
-#                  q2011 ~"did you have in learning a new task?",
-#                  q2032 ~"in taking care of your household
-#                         responsibilities?",
-#                  q2033 ~"in joining in community activities? ",
-#                  q2035 ~"concentrating on doing something for
-#                         10 minutes?",
-#                  q2036 ~"in walking a long distance such as a
-#                         kilometer?",
-#                  q2028 ~ "in standing for long periods (such as 30 minutes)?",
-#                  q2037~"in bathing/washing your whole body?",
-#                  q2038~"in getting dressed?",
-#                  q2047 ~"In the last 30 days, how much have you been emotionally
-#                         affected by your health condition(s)?")
-#    
-#      wd<- whodas %>% filter_at(vars(contains("q")), all_vars(. != "don't know")) %>% 
-#        filter_at(vars(contains("q")),
-#                  all_vars(. != "not applicable"))
-#        
-#      
-#      wd%>%select(-norm_gs,-Age)%>%tbl_summary(by=ctry, 
-#                                                label = who) %>% bold_labels()
-#    
-# ## ---- n
-# wd <- wd %>% mutate_at(vars(contains("q")), as.character)  
-# wd[wd=="none"] <- as.character(0)
-# wd[wd=="mild"] <- as.character(1)
-# wd[wd=="moderate"] <- as.character(2)
-# wd[wd=="severe"] <- as.character(3)
-# wd[wd=="extreme"] <- as.character(4)
-# 
-# wd <- wd %>% mutate_at(vars(contains("q")), as.numeric) %>% rowwise()%>%
-#   mutate(Score = sum(q2011:q2047,na.rm = TRUE)) 
-# 
-# wd%>% select(Score,ctry) %>% tbl_summary(by=ctry,type = list(Score ~ "categorical")) %>% 
-#   bold_labels()
-# 
-# wd %>% select(norm_gs,Score,ctry) %>%tbl_strata(strata=ctry, .tbl_fun = ~.x %>% 
-#                                                   tbl_continuous(variable = norm_gs)) %>% 
-#   bold_labels()
-# 
-# wd<- wd %>% mutate(Score= factor(Score, 
-#                                     levels=c("0","1","2","3","4","5", "6", "7", "9", "10"),
-#                                     ordered=TRUE))
-# 
-# ## ----wg  
-# wd %>% group_by(Age,Score) %>% summarise(med=median(norm_gs)) %>% 
-#   ggplot(aes(x = Age, y = med, col = Score)) +
-#   geom_point(size = 1.5) + geom_smooth(method = "lm",se=FALSE)+
-#   scale_color_grafify(palette="muted") +
-#   xlim (50, 124) + ylim(0.3,1.3) +
-#   labs(title = "WHODAS Score vs Age vs Gait Speed",
-#        y="Median Gait Speed", x= "Age (in years)", color="WHODAS Score")
+## ---- n
+     whodas <-gh_data %>%
+     dplyr::select(Age,Sex,q2506, q2507,BMI,q2011,q2014,q2015,q2028,q2032,q2033, q2035,q2036, 
+                   q2037, q2038,q2039,q2042,q2044,q2047,norm_gs) %>%
+     mutate(
+       ctry = "Ghana"
+     ) %>%
+     union_all(
+       sa_data  %>%
+         dplyr::select(Age,Sex,q2506, q2507,BMI,q2011,q2014,q2015,q2028,q2032,q2033, q2035,q2036, 
+                       q2037, q2038,q2039,q2042,q2044,q2047,norm_gs) %>%
+         mutate(ctry="South Africa"))%>% 
+       filter_at(vars(contains("q")), all_vars(. != "don't know")) %>%
+       filter_at(vars(contains("q")),
+                 all_vars(. != "not applicable"))
+
+     # who<- list(q2506~ "Height",
+     #            q2507~ "Weight",
+     #            q2039~ "in your day to day work?",
+     #             q2014 ~ "with making new friendships or
+     #                  maintaining current friendships?",
+     #             q2015~"with dealing with strangers?",
+     #             q2011 ~"did you have in learning a new task?",
+     #             q2032 ~"in taking care of your household
+     #                    responsibilities?",
+     #             q2033 ~"in joining in community activities? ",
+     #             q2035 ~"concentrating on doing something for
+     #                    10 minutes?",
+     #             q2036 ~"in walking a long distance such as a
+     #                    kilometer?",
+     #             q2028 ~ "in standing for long periods (such as 30 minutes)?",
+     #             q2037~"in bathing/washing your whole body?",
+     #             q2038~"in getting dressed?",
+     #             q2047 ~"In the last 30 days, how much have you been emotionally
+     #                    affected by your health condition(s)?")
+
+
+#Height,BMI, ADLs and WHODAS in one table.
+whodas <- whodas %>% filter(Age>49) %>%  mutate_at(vars(contains("q")), as.character)
+whodas[whodas=="none"] <- as.character(0)
+whodas[whodas=="mild"] <- as.character(1)
+whodas[whodas=="moderate"] <- as.character(2)
+whodas[whodas=="severe"] <- as.character(3)
+whodas[whodas=="extreme"] <- as.character(4)
+
+whodas <- whodas %>% mutate_at(vars(contains("q")), as.numeric)
+#Rearranging the columns to place the 3 q-variables dealing with ADLS at the end
+whodas<-whodas[,c(1:14,16,19,15,17,18,20:21)]
+whodas<-mutate(whodas, heightm =round(q2506/100,digits=2))
+whodas$Score<-rowSums(whodas[6:17],na.rm = TRUE)
+whodas$aScore<-rowSums(whodas[17:19],na.rm = TRUE)
+
+#WHODAS being converted into percentages and finding the quartiles to find cut-off points
+whodas<-whodas %>% mutate(wp= round((Score/48)*100,digits=2))
+#quantile(whodas$wp)
+whodas$wp[whodas$wp<2.08] <- "none/mild"
+whodas$wp[whodas$wp %in% seq(2.08,27.08,0.01)] <- "moderate"
+whodas$wp[whodas$wp %in% seq(27.09,100.00,0.01)] <- "severe"
+
+#quantile(whodas$heightm): finding quartiles to find cut-off points for the heights
+whodas$heightm[whodas$heightm<1.54] <- "below average"
+whodas$heightm[whodas$heightm %in% seq(1.54,1.67,0.01)] <- "average"
+whodas$heightm[whodas$heightm %in% seq(1.68,9.99,0.01)] <- "above average"
+
+#ADLs break it into the three questions and dichotomize each
+whodas$q2038[whodas$q2038==0] <- "none"
+whodas$q2042[whodas$q2042==0] <- "none"
+whodas$q2044[whodas$q2044==0] <- "none"
+
+whodas$q2038[whodas$q2038 %in% seq(1,5,1) ] <- "moderate"
+whodas$q2042[whodas$q2042 %in% seq(1,5,1)] <- "moderate"
+whodas$q2044[whodas$q2044 %in% seq(1,5,1)] <- "moderate"
+
+whodas$q2038[whodas$q2038 %in% seq(6,12,1) ] <- "severe"
+whodas$q2042[whodas$q2042 %in% seq(6,12,1)] <- "severe"
+whodas$q2044[whodas$q2044 %in% seq(6,12,1)] <- "severe"
+
+#i can stratify the table below according to gender
+
+whodas %>% dplyr::select(heightm,BMI,wp,q2038,q2042,q2044,norm_gs,Sex) %>% 
+  filter(BMI %in% c("Normal Weight","Obese", "Overweight","Underweight")) %>% #to account for some outliers
+  mutate(BMI = factor(BMI, levels = c("Normal Weight","Underweight", "Overweight","Obese")),
+         wp=factor(wp, levels = c("none/mild","moderate","severe")),
+         q2038= factor(q2038, levels = c("none", "moderate")),
+         q2042= factor(q2042, levels = c("none", "moderate")),
+         q2044= factor(q2044, levels = c("none", "moderate"))
+  ) %>% 
+  tbl_strata(strata = Sex,
+             ~.x %>%
+               tbl_continuous(
+                 variable = norm_gs,
+                 statistic=list(norm_gs ~ "{median}"),
+                 label=list(norm_gs ~ "Gait Speed",
+                            heightm ~ "height (in metres)",
+                            wp ~"WHODAS score",
+                            q2038 ~"Difficulty in getting dressed",
+                            q2042 ~"Difficulty with eating",
+                            q2044 ~ "Difficulty with getting to 
+                            and using the toilet"))%>%  
+               modify_caption("**Table 7. Median Gait Speed According to BMI,WHODAS and ADLs**")%>%
+               bold_labels())
 
 ## ---- g
-
 cd <- cd %>%filter(Age>49) %>% 
   mutate(Ages = cut(Age, seq(50,140,5),include.lowest=TRUE))
 
@@ -462,7 +486,6 @@ cd%>%
   labs(title = "Trend of Gait Speed with Age", 
        y ="Median Gait Speed", x="Age (in years)")+scale_colour_jama()
 
- 
 ## ---- h
 cd %>% filter(Age >= 75) %>% 
 ggplot(aes(x=Age,y=norm_gs)) + 
@@ -472,7 +495,6 @@ ggplot(aes(x=Age,y=norm_gs)) +
     labs(title = "Gait Speed in the Older Olds (Age 75 and above)",y="Median Gait Speed", x="Age (in years)")
   
 ## ---- i
-  
  a<- cd %>% filter(Age>49) %>% na.omit(ctry) %>%
    group_by(ctry,Sex) %>% 
    summarise(mean_gs= round(median(na.omit(norm_gs)),digits = 2)) %>% 
@@ -511,25 +533,16 @@ scale_colour_jama()+
    ylim(0.1,1.5)+
    coord_flip()
  ggarrange(a,b,ncol=1,nrow=2) %>% annotate_figure(top = "Gender vs Gait Speed")
-
-
-   # pv <-list(q2009 ~"Difficulty due to pain",
-   #           
-   #           q2017 ~"Difficulty due to lack of energy",
-   #           
-   #           q2000 ~"Health Rating",
-   #           q2001 ~"Difficulty with activities")
-   # 
   
 ## ---- ps  
  cp <-gh_data %>% filter(Age>49) %>% 
-   dplyr::select(q2000,q2001,q2009,q2017,norm_gs)%>%  
+   dplyr::select(Age,q2000,q2001,q2009,q2017,norm_gs)%>%  
    mutate(
      ctry = "Ghana"
    ) %>% 
    union_all(
      sa_data  %>% filter(Age>49) %>% 
-       dplyr::select(q2000,q2001,q2009,q2017,norm_gs) %>% 
+       dplyr::select(Age,q2000,q2001,q2009,q2017,norm_gs) %>% 
        mutate(ctry="South Africa"))
    
    cp %>% dplyr::select(q2000,ctry,norm_gs) %>% 
@@ -545,3 +558,40 @@ scale_colour_jama()+
      scale_color_economist(name=NULL)+
      labs(title = "Health Rating vs Gait Speed", y="Normal Gait Speed",
           x= "Health Rating")
+   
+## ---- pe
+#filtering out Age 100 and below as beyond this range not more than 3 observations
+#are seen and also tend to be in one country alone, thus not significant. 
+   
+cp<-cp %>% filter(Age <=100,
+                            q2017!= "don't know") %>% 
+mutate(Ages = cut(Age, seq(50,100,5),include.lowest=TRUE))
+ 
+levels(cp$Ages) <- c("50 to 55", "56 to 60 ","61 to 65","66 to 70","71 to 75",
+                        "76 to 80","81 to 85","86 to 90",
+                        "91 to 95","96 to 100")
+cp%>%
+dplyr::select(q2017,Ages,norm_gs) %>%
+tbl_strata(
+ strata = q2017,
+ ~.x %>%
+ tbl_continuous(
+ variable = norm_gs,
+ statistic=list(norm_gs ~ "{median}"),
+ label=list(norm_gs ~ "Gait Speed"))%>%  
+ modify_caption("**Table 9. Median Gait Speed According to Age and Exhaustion Severity**")%>%
+   bold_labels())
+
+cp%>%filter(q2009 != "don't know",q2009 != "not applicable") %>%
+  drop_na() %>% 
+dplyr::select(q2009,Ages,norm_gs) %>%
+     tbl_strata(
+       strata = q2009,
+       ~.x %>%
+         tbl_continuous(
+           variable = norm_gs,
+           statistic=list(norm_gs ~ "{median}"),
+           label=list(norm_gs ~ "Gait Speed"))%>%  
+         modify_caption("**Table 10. Median Gait Speed According to Age and Pain Severity**")%>%
+         bold_labels())
+  
