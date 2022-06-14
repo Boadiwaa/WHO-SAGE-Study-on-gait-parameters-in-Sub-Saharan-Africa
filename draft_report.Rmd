@@ -53,7 +53,7 @@ The majority of respondents (~84% representing 8564 respondents) were aged 50 ye
 
 The findings below are for the study group only.
 
-Median age was 62 for both Ghana and 61 for South Africa. The lowest count for the age groupings was for 80 years and above. The majority of respondents were female. 
+Median age was 62 for Ghana and 61 for South Africa. The lowest count for the age groupings was for 80 years and above. The majority of respondents were female. 
 The majority of respondents in Ghana resided in rural areas whereas for South Africa, the opposite was noted. The majority of respondents were either cohabiting or "currently married" in both countries, with the next highest proportion widowed. About twice the proportion of respondents who were separated/divorced in South Africa were separated/divorced in Ghana, and about nine times the proportion of respondents who had never married in Ghana had never married in South Africa. Income was almost equally distributed across the 5 quintiles.
 
 ```{r, a}
@@ -76,7 +76,7 @@ Focusing on Ghana, the median age was 64 for females and 61 for males. The major
 
 #### South Africa Data
 
-Focusing on South Africa, the median age was 60 for females and 59 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased slightly further.
+Focusing on South Africa, the median age was 61 for females and 60 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased slightly further.
 
 ```{r, b}
 

@@ -65,7 +65,8 @@ t3<-data.frame(rep(c("yes", "no"),times=c(1484,4087)))
 colnames(t3)<-"ang"
 gh_data<-qpcR:::cbind.na(gh_data,t3) %>% mutate(ang=factor(ang))
 
-t4<-data.frame(rep(c("yes", "no"),times=c(5570,0)))
+#"Yes"means diagnosed of hpt, or average bp was found to be at least 180
+t4<-data.frame(rep(c("yes", "no"),times=c(811,4759)))
 colnames(t4)<-"hp"
 gh_data<-qpcR:::cbind.na(gh_data,t4) %>% mutate(hp=factor(hp))
 
@@ -81,9 +82,6 @@ gh_data <- gh_data %>% rowwise()%>%
 t6<-data.frame(rep(c("yes", "no"),times=c(419,5154)))
 colnames(t5)<-"alcohol"
 gh_data<-qpcR:::cbind.na(gh_data,t5) %>% mutate(alcohol=factor(alcohol))
-
-#those with symptoms and sBP of at least 180 = 294 for GH and 385 for SA.
-#all those who had BP >=180 answered yes to at least one of the hpt questions
 
 #q3001 being maintained for hx of tbc as no one selected no for 3002, even for those who selected 
 #  no for 3001.
@@ -136,10 +134,10 @@ t3<-data.frame(rep(c("yes", "no"),times=c(811,3411)))
 colnames(t3)<-"ang"
 sa_data<-qpcR:::cbind.na(sa_data,t3) %>% mutate(ang=factor(ang))
  
-t4<-data.frame(rep(c("yes", "no"),times=c(4268,0)))
+t4<-data.frame(rep(c("yes", "no"),times=c(1393,2875)))
 colnames(t4)<-"hp"
 sa_data<-qpcR:::cbind.na(sa_data,t4) %>% mutate(hp=factor(hp))
- 
+
 t5<-data.frame(rep(c("yes", "no"),times=c(1367,2696)))
 colnames(t5)<-"cat"
 sa_data<-qpcR:::cbind.na(sa_data,t5) %>% mutate(cat=factor(cat))
