@@ -15,18 +15,20 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE,warning = FALSE)
 library(knitr)
-library(tidyverse)
+library(haven)
+library(labelled)
 library(foreign)
-library(ggpubr)
 library(gtsummary)
 library(ggsci)
 library(flextable)
 library(grafify)
 library(qpcR)
-library(ggstatsplot)
+library(ggpubr)
 library(ggbeeswarm)
 library(ggthemes)
 library(ggrepel)
+library(gt)
+library(tidyverse)
 
 knitr::read_chunk('edits_gait.R')
 
@@ -42,7 +44,7 @@ Only data entered from the individual questionnaires from Ghana and South Africa
 
 5573 entries were collected from Ghana and 4227 entries from South Africa. The outcomes of interest for this study were the normal and rapid gait speeds. For comparisons between independent variables, the normal gait speed was used as the dependent variable.
 
-After the demographics table, only entries with time above 0 seconds(s) for both normal and rapid gait were selected, reducing the number of entries to 4835 for Ghana and 3666 for South Africa. There was a huge gap between the third quartile and the maximum for both gait speeds which strongly suggested data collection errors. Upon further checks, a range of 1.0 to 12.0s was used for the normal gait speed for both Ghana and South Africa. 1.2 to 13.0s and 1.0 to 13.0s was used as the range for the rapid gait speed for Ghana and South Africa respectively and thus, leaving 136 outliers from Ghana and 119 from South Africa, and  86 outliers from Ghana and 58 outliers from South Africa for the normal and rapid gait speeds respectively. Other minor data cleaning and validation processes such as selection of relevant variables, and finding the average blood pressure and pulse reading from a set of three were carried.
+There were only two entries with exactly 0m/s gait speed recorded and both were from the South Africa data. A total of 1297 entries had "Not Applicable" for both normal and rapid gait speed, 738 from Ghana and 559 from South Africa. These were taken out. Three blood pressure readings were taken during the study and the mean of these readings was computed for further analysis. A gait speed of 0.1m/s was used as the cut-off value for abnormal gait speed as is the standard in many past studies. 105 entries had gait speeds at or below 0.1m/s and these were analyzed separately. The 25th and 75th percentile values for both normal and rapid gait speeds were found and outliers were imputed with those values.
 
 The two data sets were then combined yielding a total of 8501 entries.
 
@@ -68,6 +70,15 @@ The majority of respondents in Ghana resided in rural areas whereas for South Af
 
 ```
 
+### Distribution of Impaired Gait Speed Amongst the Study Group
+
+A Gait Speed of 0.1m/s was used as the cut-off for impaired gait speed, whether normal or rapid, as seen in many past studies.
+
+```{r, aig}
+
+```  
+
+
 ### In-country Differences
 
 #### Ghana Data
@@ -76,7 +87,15 @@ Focusing on Ghana, the median age was 64 for females and 61 for males. The major
 
 #### South Africa Data
 
-Focusing on South Africa, the median age was 61 for females and 60 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased slightly further.
+Focusing on South Africa, the median age was 61 for females and 60 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased slightly further. Differences in gait speed were also noted based on ethnicity.
+
+```{r, asa}
+
+``` 
+
+```{r, ieg}
+
+``` 
 
 ```{r, b}
 

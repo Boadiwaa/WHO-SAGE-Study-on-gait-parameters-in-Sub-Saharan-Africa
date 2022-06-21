@@ -1,17 +1,17 @@
 library(knitr)
-library(tidyverse)
 library(haven)
 library(labelled)
-library(ggpubr)
 library(gtsummary)
 library(foreign)
 library(ggsci)
 library(grafify)
 library(qpcR)
-library(ggstatsplot)
+library(ggpubr)
 library(ggbeeswarm)
 library(ggthemes)
 library(ggrepel)
+library(gt)
+library(tidyverse)
 
 ## ---- a
 theme_gtsummary_journal(journal = "lancet")
@@ -23,7 +23,7 @@ gh_data$q2507[gh_data$q2507 >990] <- 0
 gh_data$q2507[gh_data$q2508 >990] <- 0
 gh_data$q1017[is.na(gh_data$q1017)] = 0
 
-gh_data<- gh_data %>%  dplyr::select(q0104,q1009,q1011,q1012,q1016,q1017,q1018,q1019,q1023,
+gh_data<- gh_data %>%  dplyr::select(q0104,q1009,q1011,q1012,q1016:q1019,q1023,
                                      q2000:q2003,q2009,q2025,q2028,
                                      q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,
                                      q2042,q2044,q2047,
@@ -95,7 +95,7 @@ sa_data$q2507[sa_data$q2508 >990] <- 0
 sa_data$q1017[is.na(sa_data$q1017)] <- 0
 
 #Selection of relevant columns and finding averages of systolic and diastolic BP, pulse, from the 3 readings
-sa_data <- sa_data %>% dplyr::select(q0104,q1009,q1011,q1012,q1016,q1017,q1018,q1019,q1023,
+sa_data <- sa_data %>% dplyr::select(q0104,q1009,q1011,q1012,q1016:q1019,q1023,
                                     q2000:q2003,q2009,q2025,q2028,
                                     q2032,q2011,q2014,q2015,q2017,q2033,q2035:q2039,
                                     q2042,q2044,q2047,
@@ -219,27 +219,114 @@ com %>% filter_all(all_vars(!is.na(.))) %>%
                     alcohol ~ "History of Alcohol use")) %>% bold_labels() %>% 
   modify_caption("**Table 2. Overview of Relevant Comorbidities**")
 
+#Finding those who could not walk at all.
+no_gs <- gh_data %>%  filter(q2511==0) %>% 
+  mutate(
+    ctry = "Ghana"
+  ) %>% 
+  union_all(
+    sa_data  %>% 
+      filter(q2511==0) %>% 
+      mutate(ctry="South Africa") #only 2 entries and all from SA had 0 gait speed
+  )
+# %>% rowwise() %>% 
+#   mutate(gs = 4/q2511, Ages = cut(Age, seq(50,140,5),include.lowest=TRUE))
+
 # Dealing with gait speed outliers
-
 sa_data <-sa_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>%
-  mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+  mutate(norm_gs = 4/q2511, rap_gs = 4/q2513) #entries reduced to 3666 now (2 with 0 gait speed, the rest are NAs)
 gh_data <-gh_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>%
-  mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
+  mutate(norm_gs = 4/q2511, rap_gs = 4/q2513) #entries reduced to 4835 now (all NAs)
 
-gh_data_c <-gh_data%>% filter(q2511 < 12.1, q2513 >1.1, q2513 <13.1)%>%
-  rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
-gh_data$norm_gs[gh_data$q2511 >12.0] <- 0.7861
-gh_data$rap_gs[gh_data$q2513 >13.0] <- 1.1840
-gh_data$rap_gs[gh_data$q2513 < 1.2] <- 1.1840
-gh_data <- dplyr::select(gh_data, -q2511, -q2513)
-rm(gh_data_c)
+## ---- aig
+#Gait Speed of 0.1m/s(q2511>=40) is used as the cut-off for impaired gait speed in most studies
+abn_gs <-gh_data %>% dplyr::select(Age,q2511) %>% filter(Age>49,q2511>=40) %>% 
+  mutate(
+    ctry = "Ghana"
+  ) %>% 
+  union_all(
+    sa_data  %>% 
+      dplyr::select(Age,q2511) %>% filter(Age>49,q2511>=40) %>% 
+      mutate(ctry="South Africa")
+  ) %>% rowwise() %>% 
+  mutate(gs = 4/q2511, Ages = cut(Age, seq(50,140,5),include.lowest=TRUE))
+levels(abn_gs$Ages) <- c("50 to 55", "56 to 60 ","61 to 65","66 to 70","71 to 75",
+                         "76 to 80","81 to 85","86 to 90",
+                         "91 to 95","96 to 100","101 to 105","106 to 110","111 to 115",
+                         "101 to 105","106 to 110","111 to 115","116 to 120",
+                         "121 to 125", "126 to 130","131 to 135","136 to 140")
 
-sa_data_c <-sa_data%>% filter(q2511 < 12.1, q2513 <13.1)%>%rowwise()%>% 
-  mutate(norm_gs = 4/q2511, rap_gs = 4/q2513)
-sa_data$norm_gs[sa_data$q2511 >12.0] <- 0.8486
-sa_data$rap_gs[sa_data$q2513 >13.0] <- 1.3180
-sa_data <- dplyr::select(sa_data, -q2511, -q2513)
-rm(sa_data_c)
+abn_gs %>% 
+  ggplot(aes(x=Ages,y=gs,col=ctry))+
+  geom_point(position=position_dodge(width=.5))+ 
+  geom_line(position=position_dodge(width=.5))+
+ scale_color_jama() + #coord_flip()+
+  labs(title="Age Ranges vs Median Gait Speed amongst those with Impaired Gait Speed",
+       x= "Age Groups", y="Median Gait Speed",col="Country")
+
+# gh_data_c <-gh_data%>% filter(q2511 < 40, q2513 <40)%>%
+#   rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513) #4775 have both gait speeds above 0.1m/s
+
+# Finding the 25th and 75th percentile values and dealing with outliers
+
+gh_data$norm_gs[gh_data$norm_gs < 0.56338029] <- 0.56338029
+gh_data$rap_gs[gh_data$rap_gs < 0.88888889] <- 0.88888889
+gh_data$norm_gs[gh_data$norm_gs > 0.93023252] <- 0.93023252
+gh_data$rap_gs[gh_data$rap_gs > 1.37931030] <- 1.37931030
+
+sa_data$norm_gs[sa_data$norm_gs < 0.54794519] <- 0.54794519
+sa_data$rap_gs[sa_data$rap_gs < 0.80000000] <- 0.80000000
+sa_data$norm_gs[sa_data$norm_gs > 1.00000000] <- 1.00000000
+sa_data$rap_gs[sa_data$rap_gs > 1.33333333] <- 1.33333333
+
+# gh_data <- dplyr::select(gh_data, -q2511, -q2513)
+# rm(gh_data_c)
+
+# sa_data_c <-sa_data%>% filter(q2511 < 40, q2513 <40)%>%
+#   rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513) #3621 have both gait speeds above 0.1m/s
+# sa_data$norm_gs[sa_data$q2511 >= 40.0] <- 0.8353
+# sa_data$rap_gs[sa_data$q2513 >= 40.0] <- 1.2986
+# sa_data <- dplyr::select(sa_data, -q2511, -q2513)
+# rm(sa_data_c)
+
+
+## ---- asa
+egs<-sa_data %>% dplyr::select(Age,q1018,norm_gs,rap_gs,Income) %>% 
+  filter(Age>49,q1018!= "Don't know") %>% 
+mutate(
+    Ages = cut(Age, seq(50,140,5),include.lowest=TRUE)
+  )
+levels(egs$Ages) <- c("50 to 55", "56 to 60 ","61 to 65","66 to 70","71 to 75",
+                      "76 to 80","81 to 85","86 to 90",
+                      "91 to 95","96 to 100","101 to 105","106 to 110","111 to 115",
+                      "101 to 105","106 to 110","111 to 115","116 to 120",
+                      "121 to 125", "126 to 130","131 to 135","136 to 140")
+
+egs%>% 
+  filter(!is.na(q1018))%>% group_by(q1018) %>% 
+  summarize(mgs = round(median(norm_gs),digits=2),rgs = round(median(rap_gs),digits=2)) %>% 
+  gt() %>% 
+  cols_label(
+    q1018 = md("**Ethnicity**"),
+    mgs = md("**Median Normal Gait Speed**"),
+    rgs = md("**Median Rapid Gait Speed**")
+  ) %>% tab_header(title=md("**Ethnicity in South Africa vs.Gait Speed**"))
+
+egs %>% filter(q1018 != "Other") %>% filter(!is.na(q1018))%>% group_by(q1018,Ages)%>%
+  summarize(mgs = round(median(norm_gs),digits=2),rgs = round(median(rap_gs),digits=2))%>% 
+ggplot(aes(x=mgs, y=Ages,fill=q1018))+geom_col(position="dodge")+
+  scale_fill_jama()+
+  labs(title="Age Ranges vs Ethnicity vs Median Gait Speed in South Africa",
+       y= "Age Groups", x="Median Gait Speed",fill="Ethnicity")
+  
+## ---- ieg
+#Results show that the gait speed is not related to income.
+egs %>% filter(q1018 != "Other") %>% filter(!is.na(Income)) %>% group_by(q1018,Income)%>%
+  summarize(mgs = round(median(norm_gs),digits=2),rgs = round(median(rap_gs),digits=2))%>% 
+  ggplot(aes(x=mgs, y=q1018,fill=Income))+geom_col(position="dodge")+
+  scale_fill_jama()+
+  labs(title="Income Quintiles vs Ethnicity vs Median Gait Speed in South Africa",
+       x= "Median Gait Speed", y="Ethnicity",fill="Income Quintile")
 
 ## ---- b
 gh_data<-gh_data %>% mutate(mst = as.character(Marital_Status))
@@ -270,7 +357,7 @@ fcd<-cd %>% filter(Age>49) %>% filter_all(all_vars(!is.na(.))) %>%
 
 levels(fcd$Age_Groups) <-c("50 to 59", "60 to 69", "70 to 79", "80 and above")
   
-fcd %>% dplyr::select(-rap_gs) %>% 
+fcd %>%  
   tbl_strata(
     strata = ctry,
     ~.x %>%
@@ -278,6 +365,7 @@ fcd %>% dplyr::select(-rap_gs) %>%
         by = Sex,
         type = where(is.numeric) ~ "continuous",
         label=list(norm_gs ~"Normal Gait Speed",
+                   rap_gs ~"Rapid Gait Speed",
                    Age_Groups ~"Age Groups (in years)",
                    Age ~"Age (in years)",
                    Edu_yrs ~"Years of Education",
@@ -400,7 +488,7 @@ modify_caption("**Table 6. Multiple Regression: Gait Speed vs Health-Related Var
      #                    affected by your health condition(s)?")
 
 
-#Height,BMI, ADLs and WHODAS in one table.
+#Height,BMI,ADLs and WHODAS in one table.
 whodas <- whodas %>% filter(Age>49) %>%  mutate_at(vars(contains("q")), as.character)
 whodas[whodas=="none"] <- as.character(0)
 whodas[whodas=="mild"] <- as.character(1)
@@ -469,12 +557,12 @@ whodas %>% dplyr::select(heightm,BMI,wp,q2038,q2042,q2044,norm_gs,Sex) %>%
 cd <- cd %>%filter(Age>49) %>% 
   mutate(Ages = cut(Age, seq(50,140,5),include.lowest=TRUE))
 
-levels(cd$Ages) <- c("50 to 55", "56 to 60 ","61 to 65","66 to 70","71 to 75",
-                     "76 to 80","81 to 85","86 to 90",
-                     "91 to 95","96 to 100","101 to 105","106 to 110","111 to 115",
-                     "101 to 105","106 to 110","111 to 115","116 to 120",
-                     "121 to 125", "126 to 130","131 to 135","136 to 140")
-cd%>%
+levels(cd$Ages) <- c("50", "56","61","66","71",
+                     "76","81","86","91","96","101","106","111",
+                     "116","121","126","131","136")
+
+
+cd%>% filter(Age < 111) %>% 
   group_by(ctry,Sex,Ages)%>% 
   summarise(mean_gs= median(na.omit(norm_gs))) %>% 
   ggplot(aes(x=Ages,y=mean_gs,color=Sex,
@@ -482,7 +570,8 @@ cd%>%
              group=interaction(Sex,ctry)))+ 
   geom_point(size=2)+ geom_smooth(method="lm",se=F)+
   labs(title = "Trend of Gait Speed with Age", 
-       y ="Median Gait Speed", x="Age (in years)")+scale_colour_jama()
+       y ="Median Gait Speed", x="Age (in years)")+scale_colour_jama()+
+  scale_linetype_discrete(name="Country")
 
 ## ---- h
 cd %>% filter(Age >= 75) %>% 
@@ -493,44 +582,44 @@ ggplot(aes(x=Age,y=norm_gs)) +
     labs(title = "Gait Speed in the Older Olds (Age 75 and above)",y="Median Gait Speed", x="Age (in years)")
   
 ## ---- i
- a<- cd %>% filter(Age>49) %>% na.omit(ctry) %>%
-   group_by(ctry,Sex) %>% 
-   summarise(mean_gs= round(median(na.omit(norm_gs)),digits = 2)) %>% 
-    ggplot(aes(x = ctry,y=mean_gs, col = Sex,label=mean_gs)) +
-    geom_linerange(aes(x = ctry, ymin = 0.1, ymax = mean_gs, colour = Sex), 
-                   position = position_dodge(width = 1),size=2)+
-    geom_point(position=position_dodge(width=1),size=6)+ 
-   geom_text_repel(
-     size= 2.5,
-     force = 0.5,
-     nudge_x = 0,
-     direction= "y",
-     hjust = -0.75,
-     segment.size = 0.2)+
-    labs( title= "Normal Gait Speed", y="Median Gait Speed", x= "Country")+
-   ylim(0.1,1.5)+
-scale_colour_jama()+
-   coord_flip()
+#  a<- cd %>% filter(Age>49) %>% na.omit(ctry) %>%
+#    group_by(ctry,Sex) %>% 
+#    summarise(mean_gs= round(median(na.omit(norm_gs)),digits = 2)) %>% 
+#     ggplot(aes(x = ctry,y=mean_gs, col = Sex,label=mean_gs)) +
+#     geom_linerange(aes(x = ctry, ymin = 0.1, ymax = mean_gs, colour = Sex), 
+#                    position = position_dodge(width = 1),size=2)+
+#     geom_point(position=position_dodge(width=1),size=6)+ 
+#    geom_text_repel(
+#      size= 2.5,
+#      force = 0.5,
+#      nudge_x = 0,
+#      direction= "y",
+#      hjust = -0.75,
+#      segment.size = 0.2)+
+#     labs( title= "Normal Gait Speed", y="Median Gait Speed", x= "Country")+
+#    ylim(0.1,1.5)+
+# scale_colour_jama()+
+#    coord_flip()
  
- b<- cd %>% filter(Age>49) %>% na.omit(ctry) %>% 
-   group_by(ctry,Sex) %>% 
-   summarise(mean_gs= round(median(na.omit(rap_gs)),digits = 2)) %>% 
-   ggplot(aes(x = ctry,y=mean_gs, col = Sex,label=mean_gs)) +
-   geom_linerange(aes(x = ctry, ymin = 0.1, ymax = mean_gs, colour = Sex), 
-                  position = position_dodge(width = 1),size=2)+
-   geom_point(position=position_dodge(width=1),size=6)+ 
-   geom_text_repel(
-     size= 2.5,
-     force = 0.5,
-     nudge_x = 0,
-     direction= "y",
-     hjust = -0.75,
-     segment.size = 0.2)+
-   labs(title= "Rapid Gait Speed", y="Median Gait Speed", x= "Country")+
-   scale_colour_uchicago()+
-   ylim(0.1,1.5)+
-   coord_flip()
- ggarrange(a,b,ncol=1,nrow=2) %>% annotate_figure(top = "Gender vs Gait Speed")
+ # b<- cd %>% filter(Age>49) %>% na.omit(ctry) %>% 
+ #   group_by(ctry,Sex) %>% 
+ #   summarise(mean_gs= round(median(na.omit(rap_gs)),digits = 2)) %>% 
+ #   ggplot(aes(x = ctry,y=mean_gs, col = Sex,label=mean_gs)) +
+ #   geom_linerange(aes(x = ctry, ymin = 0.1, ymax = mean_gs, colour = Sex), 
+ #                  position = position_dodge(width = 1),size=2)+
+ #   geom_point(position=position_dodge(width=1),size=6)+ 
+ #   geom_text_repel(
+ #     size= 2.5,
+ #     force = 0.5,
+ #     nudge_x = 0,
+ #     direction= "y",
+ #     hjust = -0.75,
+ #     segment.size = 0.2)+
+ #   labs(title= "Rapid Gait Speed", y="Median Gait Speed", x= "Country")+
+ #   scale_colour_uchicago()+
+ #   ylim(0.1,1.5)+
+ #   coord_flip()
+ # ggarrange(a,b,ncol=1,nrow=2) %>% annotate_figure(top = "Gender vs Gait Speed")
   
 ## ---- ps  
  cp <-gh_data %>% filter(Age>49) %>% 
@@ -546,7 +635,7 @@ scale_colour_jama()+
    cp %>% dplyr::select(q2000,ctry,norm_gs) %>% 
      filter(q2000 != "don't know") %>% 
      ggplot(aes(x=q2000,y=norm_gs,color=q2000))+ 
-     stat_compare_means(label.x = 0.75,
+     stat_compare_means(label.x = 0.75, #stat_compare_means is from ggpubr
                         label.y=0.15)+
      geom_quasirandom(alpha = 0.7,
                       size = 1.5) + ylim(0,1.5)+
