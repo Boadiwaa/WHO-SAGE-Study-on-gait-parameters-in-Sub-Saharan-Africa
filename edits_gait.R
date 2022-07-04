@@ -4,7 +4,6 @@ library(labelled)
 library(gtsummary)
 library(foreign)
 library(ggsci)
-library(grafify)
 library(qpcR)
 library(ggpubr)
 library(ggbeeswarm)
@@ -22,6 +21,9 @@ gh_data <- read.dta("ghana.dta",convert.factors = T)%>% as_tibble()
 gh_data$q2507[gh_data$q2507 >990] <- 0
 gh_data$q2507[gh_data$q2508 >990] <- 0
 gh_data$q1017[is.na(gh_data$q1017)] = 0
+
+#Selection of relevant columns and finding the average mean blood pressures
+#and pulse from a set of three readings; re-coding of a few columns to facilitate analysis and visualization
 
 gh_data<- gh_data %>%  dplyr::select(q0104,q1009,q1011,q1012,q1016:q1019,q1023,
                                      q2000:q2003,q2009,q2025,q2028,
@@ -46,8 +48,12 @@ gh_data$BMI[gh_data$BMI %in%  seq(18.5,24.9,0.1)] <- "Normal Weight"
 gh_data$BMI[gh_data$BMI %in%  seq(25.0,29.9,0.1)] <- "Overweight"
 levels(gh_data$Edu_yrs) <- c("0", "1 to 12", "12 and above")
 
-# s<-gh_data[(gh_data$q4001 == "yes" | gh_data$q4001 == "no") & 
-#              (gh_data$q4025 == "yes" | gh_data$q4025 == "no"),]
+#The goal of the following lines of code is to create new columns 
+#that combine multiple answers under different questions into one answer.
+#e.g. A respndent who answers "yes"to q1a, q1b but no to q1c might still
+#qualify as "yes" for overall q1 and thus has the disease. Filters were applied 
+#to the data in the viewer pane to come up with the number of "yes", "no" and "NAs"
+#for the following new columns.
 
 test<-data.frame(rep(c("yes", "no"),times=c(601,4486)))
 colnames(test)<-"acld"
@@ -84,11 +90,14 @@ colnames(t5)<-"alcohol"
 gh_data<-qpcR:::cbind.na(gh_data,t5) %>% mutate(alcohol=factor(alcohol))
 
 #q3001 being maintained for hx of tbc as no one selected no for 3002, even for those who selected 
-#  no for 3001.
+#no for 3001.
 
 colnames(gh_data)[colnames(gh_data) %in% c("q0104","q1009","q1011","q1012", "quintile_c")] <- c(
                                           "Residence","Sex","Age", "Marital_Status","Income")
 #SA Data
+
+#The same processes applied to the Ghana Data were applied to the SA Data
+
 sa_data <- read.dta("sa.dta", convert.factors=T) %>% as_tibble()
 sa_data$q2507[sa_data$q2507 >990] <- 0
 sa_data$q2507[sa_data$q2508 >990] <- 0
@@ -154,7 +163,7 @@ sa_data<-qpcR:::cbind.na(sa_data,t5) %>% mutate(alcohol=factor(alcohol))
 colnames(sa_data)[colnames(sa_data) %in% c("q0104","q1009","q1011","q1012", "quintile_c")] <- c(
   "Residence","Sex","Age", "Marital_Status","Income")
 
-# Combined demographics
+# Finding the descriptive analysis of the demographics for Ghana and SA combined.
 
 dem <-gh_data %>% filter(Age>49) %>% 
   mutate(Age_Groups = cut(Age,c(50,59,69,79,140),include.lowest=TRUE)) %>% 
@@ -171,6 +180,8 @@ dem <-gh_data %>% filter(Age>49) %>%
 
 dem<-dem %>% mutate(mst = as.character(Marital_Status))
 
+#Recoding the column on Marriage because benefits of married life applies to those cohabiting
+
 dem$mst[dem$mst == "cohabiting"] <- "cohabiting/currently married"
 dem$mst[dem$mst == "currently married"] <- "cohabiting/currently married"
 levels(dem$Age_Groups) <- c("50 to 59", "60 to 69", "70 to 79", "80 and above")
@@ -184,6 +195,9 @@ dem %>% dplyr::select(-Marital_Status) %>%
                                   Income ~"Income (in quintiles)",
                                   mst ~"Marital Status")) %>% bold_labels() %>% 
 modify_caption("**Table 1. Overview of Socio-Demographic Characteristics**")
+
+
+# Finding the descriptive analysis of the data on comorbidities for Ghana and SA combined.
 
 com <- gh_data %>% filter(Age>49) %>% 
   dplyr::select(Age,Sex,alcohol,q3001,q4040,q4022,acld,abp,
@@ -219,7 +233,9 @@ com %>% filter_all(all_vars(!is.na(.))) %>%
                     alcohol ~ "History of Alcohol use")) %>% bold_labels() %>% 
   modify_caption("**Table 2. Overview of Relevant Comorbidities**")
 
+
 #Finding those who could not walk at all.
+
 no_gs <- gh_data %>%  filter(q2511==0) %>% 
   mutate(
     ctry = "Ghana"
@@ -229,8 +245,6 @@ no_gs <- gh_data %>%  filter(q2511==0) %>%
       filter(q2511==0) %>% 
       mutate(ctry="South Africa") #only 2 entries and all from SA had 0 gait speed
   )
-# %>% rowwise() %>% 
-#   mutate(gs = 4/q2511, Ages = cut(Age, seq(50,140,5),include.lowest=TRUE))
 
 # Dealing with gait speed outliers
 sa_data <-sa_data%>% filter(q2511 > 0, q2513 >0)%>% rowwise()%>%
@@ -264,9 +278,6 @@ abn_gs %>%
   labs(title="Age Ranges vs Median Gait Speed amongst those with Impaired Gait Speed",
        x= "Age Groups", y="Median Gait Speed",col="Country")
 
-# gh_data_c <-gh_data%>% filter(q2511 < 40, q2513 <40)%>%
-#   rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513) #4775 have both gait speeds above 0.1m/s
-
 # Finding the 25th and 75th percentile values and dealing with outliers
 
 gh_data$norm_gs[gh_data$norm_gs < 0.56338029] <- 0.56338029
@@ -279,18 +290,10 @@ sa_data$rap_gs[sa_data$rap_gs < 0.80000000] <- 0.80000000
 sa_data$norm_gs[sa_data$norm_gs > 1.00000000] <- 1.00000000
 sa_data$rap_gs[sa_data$rap_gs > 1.33333333] <- 1.33333333
 
-# gh_data <- dplyr::select(gh_data, -q2511, -q2513)
-# rm(gh_data_c)
-
-# sa_data_c <-sa_data%>% filter(q2511 < 40, q2513 <40)%>%
-#   rowwise()%>% mutate(norm_gs = 4/q2511, rap_gs = 4/q2513) #3621 have both gait speeds above 0.1m/s
-# sa_data$norm_gs[sa_data$q2511 >= 40.0] <- 0.8353
-# sa_data$rap_gs[sa_data$q2513 >= 40.0] <- 1.2986
-# sa_data <- dplyr::select(sa_data, -q2511, -q2513)
-# rm(sa_data_c)
-
-
 ## ---- asa
+
+#Comparing gait speed ethnicity-wise in SA as SA is made of different "races".
+
 egs<-sa_data %>% dplyr::select(Age,q1018,norm_gs,rap_gs,Income) %>% 
   filter(Age>49,q1018!= "Don't know") %>% 
 mutate(
@@ -310,7 +313,7 @@ egs%>%
     q1018 = md("**Ethnicity**"),
     mgs = md("**Median Normal Gait Speed**"),
     rgs = md("**Median Rapid Gait Speed**")
-  ) %>% tab_header(title=md("**Ethnicity in South Africa vs.Gait Speed**"))
+  ) %>% tab_header(title=md("Table 3. Ethnicity in South Africa vs.Gait Speed"))
 
 egs %>% filter(q1018 != "Other") %>% filter(!is.na(q1018))%>% group_by(q1018,Ages)%>%
   summarize(mgs = round(median(norm_gs),digits=2),rgs = round(median(rap_gs),digits=2))%>% 
@@ -320,15 +323,19 @@ ggplot(aes(x=mgs, y=Ages,fill=q1018))+geom_col(position="dodge")+
        y= "Age Groups", x="Median Gait Speed",fill="Ethnicity")
   
 ## ---- ieg
-#Results show that the gait speed is not related to income.
+
+#Finding out whether the results obtained from the code chunk above is influenced by income level.
 egs %>% filter(q1018 != "Other") %>% filter(!is.na(Income)) %>% group_by(q1018,Income)%>%
   summarize(mgs = round(median(norm_gs),digits=2),rgs = round(median(rap_gs),digits=2))%>% 
   ggplot(aes(x=mgs, y=q1018,fill=Income))+geom_col(position="dodge")+
   scale_fill_jama()+
   labs(title="Income Quintiles vs Ethnicity vs Median Gait Speed in South Africa",
        x= "Median Gait Speed", y="Ethnicity",fill="Income Quintile")
+#Results show that the gait speed is not related to income.
 
 ## ---- b
+#Recoding the column on Marriage because benefits of married life applies to those cohabiting
+
 gh_data<-gh_data %>% mutate(mst = as.character(Marital_Status))
 gh_data$mst[gh_data$mst == "cohabiting"] <- "cohabiting/currently married"
 gh_data$mst[gh_data$mst == "currently married"] <- "cohabiting/currently married"
@@ -336,6 +343,8 @@ gh_data$mst[gh_data$mst == "currently married"] <- "cohabiting/currently married
 sa_data<-sa_data %>% mutate(mst = as.character(Marital_Status))
 sa_data$mst[sa_data$mst == "cohabiting"] <- "cohabiting/currently married"
 sa_data$mst[sa_data$mst == "currently married"] <- "cohabiting/currently married"
+
+#Finding in-country demographics and comparing them gender-wise
 
 cd<-gh_data %>% 
   mutate(Age_Groups = cut(Age,c(18,50,59,69,79,140),include.lowest=TRUE)) %>% 
@@ -374,9 +383,12 @@ fcd %>%
       ) %>%
       modify_header(all_stat_cols() ~ "**{level}**") %>% 
       bold_labels() %>% add_p()
-  )
+  ) %>% modify_caption("**Table 4. In-country differences in demographics, gender-wise**")
 
 ## ---- c
+
+#Finding in-country differences in comorbidities and comparing them gender-wise
+
 com %>% dplyr::select(-Age) %>%  filter_all(all_vars(!is.na(.))) %>% 
   tbl_strata(
     strata = ctry,
@@ -397,10 +409,13 @@ com %>% dplyr::select(-Age) %>%  filter_all(all_vars(!is.na(.))) %>%
       ) %>%
       modify_header(all_stat_cols() ~ "**{level}**") %>% 
       bold_labels() %>% add_p()
-  )
+  ) %>% modify_caption("**Table 5. In-country differences in co-morbidities, gender-wise**")
 
 ## ---- d
- cd %>% 
+
+#Multiple Regression with Gait Speed as dependent variable and the demographics as independent variables
+
+cd %>% 
    dplyr::select(ctry,Age_Groups,norm_gs,Edu_yrs,mst,Residence,Sex,Income) %>% 
    filter_all(all_vars(. != "Unknown")) %>% 
    filter_all(all_vars(. != "don't know")) %>% 
@@ -414,12 +429,21 @@ com %>% dplyr::select(-Age) %>%  filter_all(all_vars(!is.na(.))) %>%
                   Income ~"Income (in quintiles)",
                   mst ~"Marital Status")
                   ) %>%  
-      modify_caption("**Table 5. Multiple Regression:Gait Speed vs Demographic Variables**")%>%
+      modify_caption("**Table 6. Multiple Regression: Gait Speed vs Demographic Variables**")%>%
       bold_labels())
 
-  #datasummary( Age_Groups+Edu_yrs+Residence+Marital_Status+Sex+Income ~ ctry * `norm_gs` * (Mean + SD), data=t)
- 
+## ---- ms1
+
+#Model summary to tell us how well the model performs
+
+model <- lm(norm_gs ~ . -rap_gs -Age -ctry , data=cd)
+summary(model) 
+confint(model) 
+
 ## ---- e
+
+#Multiple regression just as in code chunk above, but with comorbidities as independent variables
+
 cr <- gh_data %>% 
   dplyr::select(norm_gs,alcohol,q3001,q4040,q4022,acld,abp,stk,ang,hp,cat,alcohol) %>%  
   mutate(
@@ -448,11 +472,20 @@ cr %>% dplyr::select(-hp) %>%
               q3001 ~"History of Tobacco use",
               alcohol ~ "History of Alcohol use")
                     ) %>% 
-modify_caption("**Table 6. Multiple Regression: Gait Speed vs Health-Related Variables**")%>%
+modify_caption("**Table 7. Multiple Regression: Gait Speed vs Health-Related Variables**")%>%
   bold_labels())
+
+## ---- ms2
+
+model2 <- lm(norm_gs ~ . -ctry , data=cr)
+summary(model2) 
+confint(model2) 
  
 ## ---- n
-     whodas <-gh_data %>%
+
+#WHODAS scoring system for measurement of disability
+
+whodas <-gh_data %>%
      dplyr::select(Age,Sex,q2506, q2507,BMI,q2011,q2014,q2015,q2028,q2032,q2033, q2035,q2036, 
                    q2037, q2038,q2039,q2042,q2044,q2047,norm_gs) %>%
      mutate(
@@ -466,27 +499,6 @@ modify_caption("**Table 6. Multiple Regression: Gait Speed vs Health-Related Var
        filter_at(vars(contains("q")), all_vars(. != "don't know")) %>%
        filter_at(vars(contains("q")),
                  all_vars(. != "not applicable"))
-
-     # who<- list(q2506~ "Height",
-     #            q2507~ "Weight",
-     #            q2039~ "in your day to day work?",
-     #             q2014 ~ "with making new friendships or
-     #                  maintaining current friendships?",
-     #             q2015~"with dealing with strangers?",
-     #             q2011 ~"did you have in learning a new task?",
-     #             q2032 ~"in taking care of your household
-     #                    responsibilities?",
-     #             q2033 ~"in joining in community activities? ",
-     #             q2035 ~"concentrating on doing something for
-     #                    10 minutes?",
-     #             q2036 ~"in walking a long distance such as a
-     #                    kilometer?",
-     #             q2028 ~ "in standing for long periods (such as 30 minutes)?",
-     #             q2037~"in bathing/washing your whole body?",
-     #             q2038~"in getting dressed?",
-     #             q2047 ~"In the last 30 days, how much have you been emotionally
-     #                    affected by your health condition(s)?")
-
 
 #Height,BMI,ADLs and WHODAS in one table.
 whodas <- whodas %>% filter(Age>49) %>%  mutate_at(vars(contains("q")), as.character)
@@ -515,7 +527,7 @@ whodas$heightm[whodas$heightm<1.54] <- "below average"
 whodas$heightm[whodas$heightm %in% seq(1.54,1.67,0.01)] <- "average"
 whodas$heightm[whodas$heightm %in% seq(1.68,9.99,0.01)] <- "above average"
 
-#ADLs break it into the three questions and dichotomize each
+#ADLs: breaking it into the three questions and recode each
 whodas$q2038[whodas$q2038==0] <- "none"
 whodas$q2042[whodas$q2042==0] <- "none"
 whodas$q2044[whodas$q2044==0] <- "none"
@@ -550,17 +562,18 @@ whodas %>% dplyr::select(heightm,BMI,wp,q2038,q2042,q2044,norm_gs,Sex) %>%
                             q2042 ~"Difficulty with eating",
                             q2044 ~ "Difficulty with getting to 
                             and using the toilet"))%>%  
-               modify_caption("**Table 7. Median Gait Speed According to BMI,WHODAS and ADLs**")%>%
+               modify_caption("**Table 8. Median Gait Speed According to BMI,WHODAS and ADLs**")%>%
                bold_labels())
 
 ## ---- g
+#Graph of gait speed vs age
+
 cd <- cd %>%filter(Age>49) %>% 
   mutate(Ages = cut(Age, seq(50,140,5),include.lowest=TRUE))
 
 levels(cd$Ages) <- c("50", "56","61","66","71",
                      "76","81","86","91","96","101","106","111",
                      "116","121","126","131","136")
-
 
 cd%>% filter(Age < 111) %>% 
   group_by(ctry,Sex,Ages)%>% 
@@ -574,55 +587,18 @@ cd%>% filter(Age < 111) %>%
   scale_linetype_discrete(name="Country")
 
 ## ---- h
+#Zooming into the "older olds".
+
 cd %>% filter(Age >= 75) %>% 
 ggplot(aes(x=Age,y=norm_gs)) + 
     geom_point(color = "gray40", alpha = .5) + 
   geom_smooth(method = lm,color="black", fill= "firebrick")+
   ylim(0,1.5)+
     labs(title = "Gait Speed in the Older Olds (Age 75 and above)",y="Median Gait Speed", x="Age (in years)")
-  
-## ---- i
-#  a<- cd %>% filter(Age>49) %>% na.omit(ctry) %>%
-#    group_by(ctry,Sex) %>% 
-#    summarise(mean_gs= round(median(na.omit(norm_gs)),digits = 2)) %>% 
-#     ggplot(aes(x = ctry,y=mean_gs, col = Sex,label=mean_gs)) +
-#     geom_linerange(aes(x = ctry, ymin = 0.1, ymax = mean_gs, colour = Sex), 
-#                    position = position_dodge(width = 1),size=2)+
-#     geom_point(position=position_dodge(width=1),size=6)+ 
-#    geom_text_repel(
-#      size= 2.5,
-#      force = 0.5,
-#      nudge_x = 0,
-#      direction= "y",
-#      hjust = -0.75,
-#      segment.size = 0.2)+
-#     labs( title= "Normal Gait Speed", y="Median Gait Speed", x= "Country")+
-#    ylim(0.1,1.5)+
-# scale_colour_jama()+
-#    coord_flip()
- 
- # b<- cd %>% filter(Age>49) %>% na.omit(ctry) %>% 
- #   group_by(ctry,Sex) %>% 
- #   summarise(mean_gs= round(median(na.omit(rap_gs)),digits = 2)) %>% 
- #   ggplot(aes(x = ctry,y=mean_gs, col = Sex,label=mean_gs)) +
- #   geom_linerange(aes(x = ctry, ymin = 0.1, ymax = mean_gs, colour = Sex), 
- #                  position = position_dodge(width = 1),size=2)+
- #   geom_point(position=position_dodge(width=1),size=6)+ 
- #   geom_text_repel(
- #     size= 2.5,
- #     force = 0.5,
- #     nudge_x = 0,
- #     direction= "y",
- #     hjust = -0.75,
- #     segment.size = 0.2)+
- #   labs(title= "Rapid Gait Speed", y="Median Gait Speed", x= "Country")+
- #   scale_colour_uchicago()+
- #   ylim(0.1,1.5)+
- #   coord_flip()
- # ggarrange(a,b,ncol=1,nrow=2) %>% annotate_figure(top = "Gender vs Gait Speed")
-  
-## ---- ps  
- cp <-gh_data %>% filter(Age>49) %>% 
+
+## ---- ps 
+#Graph of Health Rating vs Gait Speed
+cp <-gh_data %>% filter(Age>49) %>% 
    dplyr::select(Age,q2000,q2001,q2009,q2017,norm_gs)%>%  
    mutate(
      ctry = "Ghana"
@@ -632,7 +608,7 @@ ggplot(aes(x=Age,y=norm_gs)) +
        dplyr::select(Age,q2000,q2001,q2009,q2017,norm_gs) %>% 
        mutate(ctry="South Africa"))
    
-   cp %>% dplyr::select(q2000,ctry,norm_gs) %>% 
+cp %>% dplyr::select(q2000,ctry,norm_gs) %>% 
      filter(q2000 != "don't know") %>% 
      ggplot(aes(x=q2000,y=norm_gs,color=q2000))+ 
      stat_compare_means(label.x = 0.75, #stat_compare_means is from ggpubr

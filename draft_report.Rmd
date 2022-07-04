@@ -21,7 +21,6 @@ library(foreign)
 library(gtsummary)
 library(ggsci)
 library(flextable)
-library(grafify)
 library(qpcR)
 library(ggpubr)
 library(ggbeeswarm)
@@ -148,14 +147,6 @@ The black line represents the linear regression model with the shaded area repre
 ```{r, h}
 
 ```
-
-
-### Gender vs Normal and Rapid Gait Speed
-The results below suggest that the male gender is associated with slightly higher mean gait speed:
-```{r, i}
-
-```
-
 
 ### Respondents' subjective assessment of pain, health and energy levels
 
