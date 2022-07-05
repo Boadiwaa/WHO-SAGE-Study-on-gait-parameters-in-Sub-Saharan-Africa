@@ -37,33 +37,28 @@ knitr::read_chunk('edits_gait.R')
 
 ### **Data Analysis**
 
-Only data entered from the individual questionnaires from Ghana and South Africa were analyzed for this report.
+This report is based on the analysis of  the individual questionnaires for  Ghana and South Africa. 
 
 #### Data Cleaning
 
-5573 entries were collected from Ghana and 4227 entries from South Africa. The outcomes of interest for this study were the normal and rapid gait speeds. For comparisons between independent variables, the normal gait speed was used as the dependent variable.
 
-There were only two entries with exactly 0m/s gait speed recorded and both were from the South Africa data. A total of 1297 entries had "Not Applicable" for both normal and rapid gait speed, 738 from Ghana and 559 from South Africa. These were taken out. Three blood pressure readings were taken during the study and the mean of these readings was computed for further analysis. A gait speed of 0.1m/s was used as the cut-off value for abnormal gait speed as is the standard in many past studies. 105 entries had gait speeds at or below 0.1m/s and these were analyzed separately. The 25th and 75th percentile values for both normal and rapid gait speeds were found and outliers were imputed with those values.
-
-The two data sets were then combined yielding a total of 8501 entries.
 
 
 ### Overview of Demographics and Socioeconomic Indices for Sub Saharan Africa (Ghana and South Africa combined)
 
 The majority of respondents (~84% representing 8564 respondents) were aged 50 years and above, and 1224 were from the control group (ages 18 to 49).  This represents ~ 1:7 ratio of control group to study group.
 
-The findings below are for the study group only.
+**Empirical results from study group:**
 
-Median age was 62 for Ghana and 61 for South Africa. The lowest count for the age groupings was for 80 years and above. The majority of respondents were female. 
-The majority of respondents in Ghana resided in rural areas whereas for South Africa, the opposite was noted. The majority of respondents were either cohabiting or "currently married" in both countries, with the next highest proportion widowed. About twice the proportion of respondents who were separated/divorced in South Africa were separated/divorced in Ghana, and about nine times the proportion of respondents who had never married in Ghana had never married in South Africa. Income was almost equally distributed across the 5 quintiles.
+Observed median age of  62   and 61 were recorded for Ghana and South Africa respectively. The age group with the lowest count was for 80 years and above having 9.8% and 6.5% of the respective totals. There was equal gender representation in Ghana entries but more females (57%) from South Africa.  The majority (59%) of respondents in Ghana resided in rural areas whereas for South Africa, the opposite (33%) was noted. The majority of respondents were either cohabiting or “currently married” in both countries, with the next highest proportion widowed. The proportion of respondents who were separated/divorced in in Ghana was about twice the proportion in South Africa, and about nine times the proportion of respondents who had never married in Ghana had never married in South Africa. Income was almost equally distributed across the 5 quintiles.
 
 ```{r, a}
 
 ```
 
-### Overview of Health-related Indices for Sub Saharan Africa (Ghana and South Africa combined)  
+### Overview of Health-related Indices for Sub-Saharan Africa (Ghana and South Africa combined)  
 
-<!-- The majority of respondents in Ghana were of normal weight whereas the majority from South Africa were obese.The majority of respondents had no history of chronic disease or alcohol use. For tobacco use however, the majority from Ghana had a positive history whereas the majority from South Africa had a negative history. -->
+The majority of respondents had no history of any of the comorbidities studied, except in South Africa where majority of respondents had a history of “Arthritis and Musculoskeletal Pains”.
 
 ```{r, com}
 
@@ -82,11 +77,11 @@ A Gait Speed of 0.1m/s was used as the cut-off for impaired gait speed, whether 
 
 #### Ghana Data
 
-Focusing on Ghana, the median age was 64 for females and 61 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased to 0.2. The majority of males had a history of tobacco use whereas majority of females had no history.
+Focusing on Ghana, the median age was 64 for females and 61 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased to 0.21. The majority of males had a history of tobacco use whereas majority of females had no history.
 
 #### South Africa Data
 
-Focusing on South Africa, the median age was 61 for females and 60 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased slightly further. Differences in gait speed were also noted based on ethnicity.
+Focusing on South Africa, the median age was 61 for females and 60 for males. The majority of males were "currently married" whereas the majority of females were widowed. Males had a slightly higher normal gait speed than females. With rapid gait speed, the gender difference increased slightly further. Differences in gait speed were also noted based on ethnicity.Those identifying as "White" had a significantly higher gait speed as compared to those of other ethnicities.This observation was irrespective of income level. Income levels did not affect the median gait speed of respondents. 
 
 ```{r, asa}
 
@@ -96,10 +91,21 @@ Focusing on South Africa, the median age was 61 for females and 60 for males. Th
 
 ``` 
 
+### In-Country and Gender Differences: Socio-Demographic Characteristics
+
+More females in  South Africa had more years of education as compared to males. The opposite was seen in Ghana. In both countries, more men were "currently married/cohabiting" as compared to women, and a higher proportion of females were widowed or "separated/divorced" as compared to males. In South Africa, more women had never married as compared to men. In Ghana, there was no gender difference.
+
 ```{r, b}
 
 ```
 
+### In-Country and Gender Differences: Co-Morbidities
+
+Generally, more people did not have a history of alcohol use in both countries. For those who did though, slightly more women had a positive history as compared to men. 
+
+For tobacco use, almost four times more women in South Africa had a positive history compared to women in Ghana. there was not much difference between men across the two countries.
+
+In total, women had more positive histories of comorbidities as compared  to men.
 
 ```{r c}
 
@@ -118,7 +124,13 @@ The table below shows the multiple regression results with the gait speed as the
 
 <!-- Obesity,defined as a Body-Mass Index (BMI) of 30kg/m2 and above, decrease in mean gait speed which was considered statistically significant. Being underweight (BMI <18.5kg/m2) was associated with a reduction in mean gait speed by 0.03 (statistically insignificant).   -->
 
-<!-- Generally, having no history of chronic disease was associated with higher gait speed, with the exception of Diabetes Mellitus, Injury from Road Traffic Accidents and Cataracts. A history of alcohol use was associated with a statistically significant lower gait speed. On the other hand, a history of tobacco use was associated with an insignificant increase in gait speed. -->
+History of alcohol use does not show a significant difference in gait speed of those who responded yes relative to those who responded no for both countries when all other variables are held constant.
+
+There is a 0.04 increase (significance of 0.004) in gait speed for persons with a positive history of tobacco use relative to those with no history of tobacco use in Ghana. There is an increase of 0.01 in South Africa but not significant.  This is when all other variables are held constant.
+
+History of Depression reduced gait speed significantly for "yes" relative to "no" in Ghana but not in South Africa.
+
+A positive history of Diabetes Mellitus reduces gait speed: no significant reduction in Ghana but significant in South Africa.
 
 
 ```{r, e}
@@ -152,7 +164,7 @@ The black line represents the linear regression model with the shaded area repre
 
 ### Association of Health Rating with gait speed
 
-The graph below shows respondents' subjective assessment of health level and it's association with gait speed. The line in the box represent the median, and the entire box represents the interquartile range. The density of the surrounding dotted area represents the number of respondents' who chose that answer as their health rating.
+The graph below shows respondents' subjective assessment of health level and it's association with gait speed. The line in the box represents the median, and the entire box represents the interquartile range. The density of the surrounding dotted area represents the number of respondents' who chose that answer as their health rating.
 
 ```{r, ps}
 
